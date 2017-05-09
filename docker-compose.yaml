@@ -10,3 +10,14 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: wdm
+  server:
+    build:
+      context: ./src
+    command: "npm run dev"
+    ports:
+      - "2222:80"
+    volumes:
+      - ./src:/var/www
+    links:
+      - postgres:postgres
+
