@@ -34,3 +34,5 @@ services:
     ports:
       - "2225:7687"
       - "2226:7474"
+    environment:
+      NEO4J_AUTH: none
