@@ -15,7 +15,7 @@ services:
       context: .
     command: "npm run dev"
     ports:
-      - "2222:80"
+      - "2222:3000"
     volumes:
       - .:/var/www
     links:
