@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const connection = require('./connection');
+const connection = require('../connection');
 
 const Movie = connection.define('movies', {
   id: {
