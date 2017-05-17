@@ -1,7 +1,7 @@
 const Models = require('./models');
 
 const typeMap = {
-  actors: 'Actor'
+  movies: 'Movie'
 }
 
 function _getModel(type) {
