@@ -33,3 +33,4 @@ services:
       - ./data/neo4j:/data
     ports:
       - "2225:7687"
+      - "2226:7474"
