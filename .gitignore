@@ -45,3 +45,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Node modules
+*/node_modules/
+
+# Data dir
+data/
