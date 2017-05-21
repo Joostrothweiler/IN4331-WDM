@@ -4,16 +4,19 @@ const morgan = require('morgan');
 const { SERVER_PORT } = require('./config');
 
 const PG = require('./pg');
+const NEO = require('./neo');
+
+const currentDb = NEO;
 
 const server = express();
 
-async function findAll(type, options) {
+async function findAll(req, type, options) {
   const { where, page, perPage } = options;
-  return PG.findAll(type, where, page, perPage);
+  return currentDb.findAll(req, type, where, page, perPage);
 }
 
-async function find(type, id) {
-  return PG.find(type, id);
+async function find(req, type, id) {
+  return currentDb.find(type, id);
 }
 
 server.use(morgan('combined'));
@@ -29,8 +32,8 @@ server.get('/:type', (req, res, next) => {
   delete where.page;
   delete where.perPage;
 
-  findAll(type, { where, page, perPage }).then(results => {
-    // console.log(`Results for ${type}:`, results);
+  findAll(req, type, where,{ page, perPage }).then(results => {
+    console.log(`Number of results for ${type}:`, results.length);
     res.json(results);
   }).catch(next);
 });
