@@ -10,7 +10,7 @@ function _getModel(type) {
   return Models[key];
 }
 
-async function findAll(type, page = 0, perPage = 10) {
+async function findAll(req, type, page = 0, perPage = 10) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
 
   const Model = _getModel(type);

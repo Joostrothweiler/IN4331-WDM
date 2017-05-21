@@ -4,12 +4,15 @@ const morgan = require('morgan');
 const { SERVER_PORT } = require('./config');
 
 const PG = require('./pg');
+const NEO = require('./neo');
+
+const currentDb = NEO;
 
 const server = express();
 
-async function findAll(type, options) {
+async function findAll(req, type, options) {
   const { page, perPage } = options;
-  return PG.findAll(type, page, perPage);
+  return currentDb.findAll(req, type, page, perPage);
 }
 
 server.use(morgan('combined'));
@@ -20,8 +23,8 @@ server.get('/favicon.ico', (req, res, next) => res.status(404).end());
 server.get('/:type', (req, res, next) => {
   const { type } = req.params;
   const { page = 0, perPage = 10 } = req.query;
-  findAll(type, { page, perPage }).then(results => {
-    console.log(`Results for ${type}:`, results);
+  findAll(req, type, { page, perPage }).then(results => {
+    console.log(`Number of results for ${type}:`, results.length);
     res.json(results);
   }).catch(next);
 });
