@@ -1,16 +1,16 @@
 const _ = require('lodash');
 const connection = require('../connection.js');
-const Movie = require('./neo4j/movie.js');
+const Actor = require('./neo4j/actor.js');
 
 
 const manyMovies = (results) => {
-  return results.records.map(r => new Movie(r.get('movie')))
+  return results.records.map(r => new Actor(r.get('actor')))
 }
 
 // get all movies
 const findAll = (session) => {
   return session
-    .run('MATCH (movie:Movie) RETURN movie')
+    .run('MATCH (actor:Actor) RETURN actor')
     .then(r => manyMovies(r));
 };
 
