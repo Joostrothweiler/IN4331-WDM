@@ -12,6 +12,12 @@ function _getModel(type) {
   return Models[key];
 }
 
+async function find(req, type, id) {
+  console.log(`Finding ${type} with id = ${id}`);
+  let results = await findAll(req, type, { id });
+  return results[0];
+}
+
 async function findAll(req, type, page = 0, perPage = 10) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
 
@@ -20,5 +26,6 @@ async function findAll(req, type, page = 0, perPage = 10) {
 }
 
 module.exports = {
-  findAll
+  findAll,
+  find
 };
