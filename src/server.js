@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const { SERVER_PORT } = require('./config');
 
@@ -9,6 +10,10 @@ const NEO = require('./neo');
 const currentDb = NEO;
 
 const server = express();
+
+server.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 
 async function findAll(req, type, options) {
@@ -20,10 +25,24 @@ async function find(req, type, id) {
   return currentDb.find(req, type, id);
 }
 
+async function insertModel(req, type, object) {
+  return currentDb.insertModel(req, type, object);
+}
+
 server.use(morgan('combined'));
 
 // Disable favicon
 server.get('/favicon.ico', (req, res, next) => res.status(404).end());
+
+server.post('/:type', (req, res, next) => {
+  const { type } = req.params;
+
+  insertModel(req, type, req.body).then(results => {
+    res.json(results);
+  }).catch(next);
+})
+
+
 
 server.get('/:type', (req, res, next) => {
   const { type } = req.params;

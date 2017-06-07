@@ -12,10 +12,17 @@ function _getModel(type) {
   return Models[key];
 }
 
-async function find(req, type, id) {
-  console.log(`Finding ${type} with id = ${id}`);
-  let results = await findAll(req, type, { id });
-  return results[0];
+async function insertModel(req, type, object) {
+  console.log(`Inserting ${type}`);
+  const Model = _getModel(type);
+  return Model.insert(connection.getSession(req), object);
+}
+
+// TODO: Optional to retrieve by id instead - but then we need to insert it from postgres.
+async function find(req, type, title) {
+  console.log(`Finding ${type} with title = ${title}`);
+  const Model = _getModel(type);
+  return Model.find(connection.getSession(req), title);
 }
 
 async function findAll(req, type, page = 0, perPage = 10) {
@@ -26,6 +33,7 @@ async function findAll(req, type, page = 0, perPage = 10) {
 }
 
 module.exports = {
+  insertModel,
   findAll,
   find
 };
