@@ -10,21 +10,23 @@ const manyActors = (results) => {
 const insert = (session, object) => {
   return session
     .run(`CREATE (actor:Actor {
-        lname:'${object.lname}',
-        fname:'${object.fname}',
-        mname:'${object.mname}',
-        gender:'${object.gender}',
-        number:'${object.number}'
+        id: '${object.id}',
+        lname: '${object.lname}',
+        fname: '${object.fname}',
+        mname: '${object.mname}',
+        gender: '${object.gender}',
+        number: '${object.number}'
       }) RETURN actor`)
     .then(r => manyActors(r));
 }
 
 // Fuzzy matching title based on fname, lname, parts of those and lower case.
-const find = (session, name) => {
+const find = (session, identifier) => {
   return session
     .run(`MATCH (actor:Actor) WHERE
-      actor.fname =~ '(?i).*${name}.*' OR
-      actor.lname =~ '(?i).*${name}.*' RETURN actor`)
+      actor.id = ${identifier} OR
+      actor.fname =~ '(?i).*${identifier}.*' OR
+      actor.lname =~ '(?i).*${identifier}.*' RETURN actor`)
     .then(r => manyActors(r));
 }
 
