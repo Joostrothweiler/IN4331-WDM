@@ -1,0 +1,28 @@
+{
+  "name": "wdm",
+  "version": "1.0.0",
+  "description": "web-data-management assignment",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "NODE_ENV=test nyc tap -R tap test/index.js",
+    "dev": "nodemon -w .env -w src src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "express": "^4.15.3",
+    "morgan": "^1.8.1",
+    "pg": "^6.2.2",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.30.4"
+  },
+  "devDependencies": {
+    "blue-tape": "^0.2.0",
+    "codecov": "^1.0.1",
+    "nodemon": "^1.11.0",
+    "nyc": "^6.0.0",
+    "tap": "^5.7.0"
+  }
+}
