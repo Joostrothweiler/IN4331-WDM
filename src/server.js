@@ -7,7 +7,7 @@ const { SERVER_PORT } = require('./config');
 const PG = require('./pg');
 const NEO = require('./neo');
 
-const currentDb = NEO;
+const currentDb = PG;
 
 const server = express();
 
@@ -34,13 +34,13 @@ server.get('/favicon.ico', (req, res, next) => res.status(404).end());
 
 server.get('/migrate/:type', (req, res, next) => {
   const { type } = req.params;
-  const { page = 0, perPage = 100 } = req.query;
+  const { page = 0, perPage = 10 } = req.query;
   let where = Object.assign({}, req.query);
   delete where.page;
   delete where.perPage;
   findAll(req, type, { where, page, perPage }, PG).then(results => {
     for (var movie of results) {
-      const object = { 'pg_id': movie.id, 'title': movie.title, 'year': movie.year };
+      const object = { 'id': movie.id, 'title': movie.title, 'year': movie.year };
 
       insertModel(req, type, object, NEO).then(results => {
         res.json('inserted movies into NEO');
