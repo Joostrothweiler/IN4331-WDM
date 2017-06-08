@@ -10,7 +10,7 @@ const manyMovies = (results) => {
 
 const insert = (session, object) => {
   return session
-    .run(`CREATE (movie:Movie {title:'${object.title}', released:${object.year}, tagline:'${object.tagline}'}) RETURN movie`)
+    .run(`CREATE (movie:Movie {title:'${object.title}', pg_id:${object.pg_id}, year:'${object.year}'}) RETURN movie`)
     .then(r => manyMovies(r));
 }
 
