@@ -15,23 +15,39 @@ server.use(bodyParser.urlencoded({
   extended: true
 }));
 
-async function findAll(req, type, options) {
+async function findAll(req, type, options, responseDb = currentDb) {
   const { where, page, perPage } = options;
-  return currentDb.findAll(req, type, where, page, perPage);
+  return responseDb.findAll(req, type, where, page, perPage);
 }
 
-async function find(req, type, id) {
-  return currentDb.find(type, id);
+async function find(req, type, id, responseDb = currentDb) {
+  return responseDb.find(req, type, id);
 }
 
-async function insertModel(req, type, object) {
-  return currentDb.insertModel(req, type, object);
+async function insertModel(req, type, object, responseDb = currentDb) {
+  return responseDb.insertModel(req, type, object);
 }
 
 server.use(morgan('combined'));
-
 // Disable favicon
 server.get('/favicon.ico', (req, res, next) => res.status(404).end());
+
+server.get('/migrate/:type', (req, res, next) => {
+  const { type } = req.params;
+  const { page = 0, perPage = 100 } = req.query;
+  let where = Object.assign({}, req.query);
+  delete where.page;
+  delete where.perPage;
+  findAll(req, type, { where, page, perPage }, PG).then(results => {
+    for (var movie of results) {
+      const object = { 'pg_id': movie.id, 'title': movie.title, 'year': movie.year };
+
+      insertModel(req, type, object, NEO).then(results => {
+        res.json('inserted movies into NEO');
+      }).catch(next);
+    }
+  }).catch(next);
+});
 
 server.post('/:type', (req, res, next) => {
   const { type } = req.params;
@@ -39,9 +55,7 @@ server.post('/:type', (req, res, next) => {
   insertModel(req, type, req.body).then(results => {
     res.json(results);
   }).catch(next);
-})
-
-
+});
 
 server.get('/:type', (req, res, next) => {
   const { type } = req.params;
