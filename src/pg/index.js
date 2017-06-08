@@ -11,12 +11,13 @@ function _getModel(type) {
   return Models[key];
 }
 
-async function find(type, id) {
-  let results = await findAll(type, { id });
+async function find(req, type, id) {
+  console.log(`Finding ${type} with id = ${id}`);
+  let results = await findAll(req, type, { id });
   return results[0];
 }
 
-async function findAll(type, where = { }, page = 0, perPage = 10) {
+async function findAll(req, type, where = { }, page = 0, perPage = 10) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
 
   const Model = _getModel(type);
