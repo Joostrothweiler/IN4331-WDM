@@ -7,7 +7,7 @@ const { SERVER_PORT } = require('./config');
 const PG = require('./pg');
 const NEO = require('./neo');
 
-const currentDb = PG;
+const currentDb = NEO;
 
 const server = express();
 
@@ -15,17 +15,17 @@ server.use(bodyParser.urlencoded({
   extended: true
 }));
 
-async function findAll(req, type, options, responseDb = currentDb) {
+async function findAll(responseDb, type, options) {
   const { where, page, perPage } = options;
-  return responseDb.findAll(req, type, where, page, perPage);
+  return responseDb.findAll(type, where, page, perPage);
 }
 
-async function find(req, type, id, responseDb = currentDb) {
-  return responseDb.find(req, type, id);
+async function find(responseDb, type, id) {
+  return responseDb.find(type, id);
 }
 
-async function insertModel(req, type, object, responseDb = currentDb) {
-  return responseDb.insertModel(req, type, object);
+async function insertModel(responseDb, type, object) {
+  return responseDb.insertModel(type, object);
 }
 
 server.use(morgan('combined'));
@@ -52,7 +52,7 @@ server.get('/migrate/:type', (req, res, next) => {
 server.post('/:type', (req, res, next) => {
   const { type } = req.params;
 
-  insertModel(req, type, req.body).then(results => {
+  insertModel(currentDb, type, req.body).then(results => {
     res.json(results);
   }).catch(next);
 });
@@ -65,7 +65,7 @@ server.get('/:type', (req, res, next) => {
   delete where.page;
   delete where.perPage;
 
-  findAll(req, type, where,{ page, perPage }).then(results => {
+  findAll(currentDb, type, where,{ page, perPage }).then(results => {
     console.log(`Number of results for ${type}:`, results.length);
     res.json(results);
   }).catch(next);
@@ -73,7 +73,7 @@ server.get('/:type', (req, res, next) => {
 
 server.get('/:type/:id', (req, res, next) => {
   const { type, id } = req.params;
-  find(type, id).then(result => {
+  find(currentDb, type, id).then(result => {
     // console.log(`Result for ${type} ${id}:`, result);
     res.json(result);
   }).catch(next);

@@ -1,4 +1,3 @@
-const connection = require('./connection');
 const Models = require('./models');
 
 const typeMap = {
@@ -12,24 +11,24 @@ function _getModel(type) {
   return Models[key];
 }
 
-async function insertModel(req, type, object) {
+async function insertModel(type, object) {
   console.log(`Inserting ${type}`);
   const Model = _getModel(type);
-  return Model.insert(connection.getSession(req), object);
+  return Model.insert(object);
 }
 
 // TODO: Optional to retrieve by id instead - but then we need to insert it from postgres.
-async function find(req, type, title) {
-  console.log(`Finding ${type} with title = ${title}`);
+async function find(type, identifier) {
+  console.log(`Finding ${type} with identifier = ${identifier}`);
   const Model = _getModel(type);
-  return Model.find(connection.getSession(req), title);
+  return Model.find(identifier);
 }
 
-async function findAll(req, type, page = 0, perPage = 10) {
+async function findAll(type, page = 0, perPage = 10) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
 
   const Model = _getModel(type);
-  return Model.findAll(connection.getSession(req));
+  return Model.findAll();
 }
 
 module.exports = {

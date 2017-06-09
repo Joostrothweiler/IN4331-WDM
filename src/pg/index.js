@@ -16,7 +16,7 @@ async function find(type, id) {
   return results[0];
 }
 
-async function findAll(req, type, where = { }, page = 0, perPage = 10) {
+async function findAll(type, where = { }, page = 0, perPage = 10) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
 
   const Model = _getModel(type);

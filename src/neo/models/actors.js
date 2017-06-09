@@ -1,5 +1,4 @@
-const _ = require('lodash');
-const connection = require('../connection.js');
+const { SESSION } = require('../connection.js');
 const Actor = require('./neo4j/actor.js');
 
 
@@ -7,8 +6,8 @@ const manyActors = (results) => {
   return results.records.map(r => new Actor(r.get('actor')))
 }
 
-const insert = (session, object) => {
-  return session
+const insert = (object) => {
+  return SESSION
     .run(`CREATE (actor:Actor {
         id: '${object.id}',
         lname: '${object.lname}',
@@ -21,8 +20,8 @@ const insert = (session, object) => {
 }
 
 // Fuzzy matching title based on fname, lname, parts of those and lower case.
-const find = (session, identifier) => {
-  return session
+const find = (identifier) => {
+  return SESSION
     .run(`MATCH (actor:Actor) WHERE
       actor.id = ${identifier} OR
       actor.fname =~ '(?i).*${identifier}.*' OR
@@ -31,8 +30,8 @@ const find = (session, identifier) => {
 }
 
 // get all movies
-const findAll = (session) => {
-  return session
+const findAll = () => {
+  return SESSION
     .run('MATCH (actor:Actor) RETURN actor')
     .then(r => manyActors(r));
 };

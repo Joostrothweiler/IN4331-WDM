@@ -1,5 +1,4 @@
-const _ = require('lodash');
-const connection = require('../connection.js');
+const { SESSION } = require('../connection.js');
 const Genre = require('./neo4j/genre.js');
 
 
@@ -8,8 +7,8 @@ const manyGenres = (results) => {
 }
 
 // get all movies
-const findAll = (session) => {
-  return session
+const findAll = () => {
+  return SESSION
     .run('MATCH (genre:Genre) RETURN genre')
     .then(r => manyGenres(r));
 };
