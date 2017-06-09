@@ -31,8 +31,16 @@ async function findAll(type, page = 0, perPage = 10) {
   return Model.findAll();
 }
 
+async function deleteAll(type, page = 0, perPage = 10) {
+  console.log(`Deleting ${type} page ${page} per ${perPage}`);
+
+  const Model = _getModel(type);
+  return Model.deleteAll();
+}
+
 module.exports = {
   insertModel,
   findAll,
-  find
+  find,
+  deleteAll
 };

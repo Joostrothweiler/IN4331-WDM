@@ -9,7 +9,7 @@ const manyMovies = (results) => {
 
 const insert = (object) => {
   return SESSION
-    .run(`CREATE (movie:Movie {id:${object.id}, title:'${object.title}', year:'${object.year}'}) RETURN movie`)
+    .run(`CREATE (movie:Movie {id:${object.id}, title:"${object.title}", year:"${object.year}"}) RETURN movie`)
     .then(r => manyMovies(r));
 }
 
@@ -18,18 +18,25 @@ const find = (identifier) => {
   return SESSION
     .run(`MATCH (movie:Movie) WHERE
       movie.id = ${identifier} OR
-      movie.title =~ '(?i).*${identifier}.*' RETURN movie`)
+      movie.title =~ "(?i).*${identifier}.*" RETURN movie`)
     .then(r => manyMovies(r));
 }
 
 const findAll = () => {
   return SESSION
-    .run('MATCH (movie:Movie) RETURN movie')
+    .run(`MATCH (movie:Movie) RETURN movie`)
     .then(r => manyMovies(r));
 };
+
+const deleteAll = () => {
+  return SESSION
+    .run(`MATCH (movie:Movie) DETACH DELETE movie`)
+    .then(r => r);
+}
 
 module.exports = {
   insert,
   find,
-  findAll
+  findAll,
+  deleteAll
 };
