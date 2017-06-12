@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "NODE_ENV=test nyc tap -R tap test/index.js",
-    "dev": "nodemon -w .env -w src src/server.js"
+    "dev": "nodemon -w .env -w src src/server.js",
+    "init-mongo": "node src/mongo/initialize-rs.js"
   },
   "author": "",
   "license": "ISC",
