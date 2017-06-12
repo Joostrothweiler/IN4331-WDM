@@ -11,9 +11,9 @@ const typeMap = {
 
 const assocMap = {
   'movies': [ 'actors', 'genres', 'series', 'aka_titles' ],
-  'actors': [ 'movies', 'aka_names' ],
+  'actors': [ 'movies', 'aka_names', 'series' ],
   'genres': [ ],
-  'series': [ 'movies' ],
+  'series': [ 'movies', 'actors' ],
   'aka_titles': [ 'movies' ],
   'aka_names': [ 'actors' ],
 };

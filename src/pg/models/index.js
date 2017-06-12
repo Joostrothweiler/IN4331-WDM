@@ -13,6 +13,9 @@ const AKANames = require('./aka_names');
 Actor.belongsToMany(Movie, { through: ActedIn, foreignKey: 'idactors', otherkey: 'idmovies', constraints: false });
 Movie.belongsToMany(Actor, { through: ActedIn, foreignKey: 'idmovies', otherkey: 'idactors', constraints: false });
 
+Series.belongsToMany(Actor, { through: ActedIn, foreignKey: 'idseries', otherkey: 'idactors', constraints: false });
+Actor.belongsToMany(Series, { through: ActedIn, foreignKey: 'idactors', otherkey: 'idseries', constraints: false });
+
 Movie.belongsToMany(Genre, { through: MoviesGenres, foreignKey: 'idmovies', otherkey: 'idgenres', constraints: false });
 Genre.belongsToMany(Movie, { through: MoviesGenres, foreignKey: 'idgenres', otherkey: 'idmovies', constraints: false });
 
