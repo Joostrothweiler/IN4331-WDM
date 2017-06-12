@@ -6,14 +6,16 @@ const typeMap = {
   genres: 'Genre',
   series: 'Series',
   aka_titles: 'AKATitles',
+  aka_names: 'AKANames',
 };
 
 const assocMap = {
   'movies': [ 'actors', 'genres', 'series', 'aka_titles' ],
-  'actors': [ 'movies' ],
+  'actors': [ 'movies', 'aka_names' ],
   'genres': [ ],
   'series': [ 'movies' ],
   'aka_titles': [ 'movies' ],
+  'aka_names': [ 'actors' ],
 };
 
 function _getModel(type) {
