@@ -7,6 +7,7 @@ const Series = require('./series');
 
 const ActedIn = require('./acted_in');
 const MoviesGenres = require('./movies_genres');
+const AKATitles = require('./aka_titles');
 
 Actor.belongsToMany(Movie, { through: ActedIn, foreignKey: 'idactors', otherkey: 'idmovies', constraints: false });
 Movie.belongsToMany(Actor, { through: ActedIn, foreignKey: 'idmovies', otherkey: 'idactors', constraints: false });
@@ -17,6 +18,9 @@ Genre.belongsToMany(Movie, { through: MoviesGenres, foreignKey: 'idgenres', othe
 Movie.hasMany(Series, { foreignKey: 'idmovies', otherkey: 'idseries' });
 Series.belongsTo(Movie, { foreignKey: 'idmovies', otherkey: 'idseries' });
 
+Movie.hasMany(AKATitles, { foreignKey: 'idmovies', otherkey: 'idaka_titles' });
+AKATitles.belongsTo(Movie, { foreignKey: 'idmovies', otherkey: 'idaka_titles' });
+
 module.exports = {
   Movie,
   Actor,
@@ -24,4 +28,5 @@ module.exports = {
   Series,
 
   ActedIn,
+  AKATitles,
 }
