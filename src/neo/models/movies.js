@@ -8,8 +8,12 @@ const manyMovies = (results) => {
 }
 
 const insert = (object) => {
+  if (object.year.length !== 4) {
+    object.year = 0;
+  }
+
   return SESSION
-    .run(`CREATE (movie:Movie {id:${object.id}, title:"${object.title}", year:"${object.year}"}) RETURN movie`)
+    .run(`CREATE (movie:Movie {id:${object.id}, title:"${object.title}", year:${object.year}}) RETURN movie`)
     .then(r => manyMovies(r));
 }
 

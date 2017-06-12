@@ -42,26 +42,13 @@ async function insertModel(db, type, object) {
   return db.insertModel(type, object);
 }
 
+async function insertMovieRole(db, actorId, movieId) {
+  return db.insertMovieRole(actorId, movieId);
+}
+
 server.use(morgan('combined'));
 // Disable favicon
 server.get('/favicon.ico', (req, res, next) => res.status(404).end());
-
-server.get('/migrate/:type', (req, res, next) => {
-  const { type } = req.params;
-  const { page = 0, perPage = 10 } = req.query;
-  let where = Object.assign({}, req.query);
-  delete where.page;
-  delete where.perPage;
-  findAll(req, type, { where, page, perPage }, PG).then(results => {
-    for (var movie of results) {
-      const object = { 'id': movie.id, 'title': movie.title, 'year': movie.year };
-
-      insertModel(req, type, object, NEO).then(results => {
-        res.json('inserted movies into NEO');
-      }).catch(next);
-    }
-  }).catch(next);
-});
 
 server.post('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
@@ -107,18 +94,16 @@ server.get('/:database/:type/:id', (req, res, next) => {
   const currentDb = _getDatabase(database);
 
   find(currentDb, type, id).then(result => {
-    // console.log(`Result for ${type} ${id}:`, result);
     res.json(result);
   }).catch(next);
 });
 
 // Insert actor - movie relation by passing actor and movie id.
-server.post('/:database/actor/:actor/movies/:movie', (req, res, next) => {
+server.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { database, actor, movie } = req.params;
   const currentDb = _getDatabase(database);
 
-  insertMovieRole(currentDb, type, actor, movie).then(result => {
-    // console.log(`Result for ${type} ${id}:`, result);
+  insertMovieRole(currentDb, actor, movie).then(result => {
     res.json(result);
   }).catch(next);
 });
