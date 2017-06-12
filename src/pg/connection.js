@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const { POSTGRES_URL } = require('../config');
+const { POSTGRES_URL, POSTGRES_DBNAME } = require('../config');
 
-const sequelize = new Sequelize(POSTGRES_URL);
+const sequelize = new Sequelize(`${POSTGRES_URL}${POSTGRES_DBNAME}`);
 
 sequelize.authenticate()
   .then(err => {
