@@ -25,8 +25,8 @@ server.use(bodyParser.urlencoded({
 }));
 
 async function findAll(db, type, options) {
-  const { where, page, perPage } = options;
-  return db.findAll(type, where, page, perPage);
+  const { where, page, perPage, orderby, dir } = options;
+  return db.findAll(type, where, page, perPage, orderby, dir);
 }
 
 async function deleteAll(db, type, options) {
@@ -62,14 +62,16 @@ server.post('/:database/:type', (req, res, next) => {
 
 server.get('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
-  const { page = 0, perPage = 10 } = req.query;
+  const { page = 0, perPage = 10, dir = 'asc', orderby = 'id'} = req.query;
   const currentDb = _getDatabase(database);
 
   let where = Object.assign({}, req.query);
   delete where.page;
   delete where.perPage;
+  delete where.dir;
+  delete where.orderby;
 
-  findAll(currentDb, type, { where, page, perPage }).then(results => {
+  findAll(currentDb, type, { where, page, perPage, orderby, dir }).then(results => {
     res.json(results);
   }).catch(next);
 });
