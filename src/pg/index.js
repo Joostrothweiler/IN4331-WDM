@@ -4,16 +4,18 @@ const typeMap = {
   movies: 'Movie',
   actors: 'Actor',
   genres: 'Genre',
+  keywords: 'Keyword',
   series: 'Series',
   aka_titles: 'AKATitles',
   aka_names: 'AKANames',
 };
 
 const assocMap = {
-  'movies': [ 'actors', 'genres', 'series', 'aka_titles' ],
+  'movies': [ 'actors', 'genres', 'series', 'aka_titles', 'keywords' ],
   'actors': [ 'movies', 'aka_names', 'series' ],
-  'genres': [ ],
-  'series': [ 'movies', 'actors' ],
+  'genres': [ 'movies', 'series' ],
+  'keywords': [ 'movies', 'series' ],
+  'series': [ 'movies', 'actors', 'genres' ,'keywords' ],
   'aka_titles': [ 'movies' ],
   'aka_names': [ 'actors' ],
 };
