@@ -2,10 +2,15 @@ const request = require('request');
 const rp = require('request-promise');
 const { BASE_URL } = require('../config');
 
+
+async function insertModel() {
+  return 1;
+}
+
 const migrateModels = (type) => {
 
   let neoUrl = BASE_URL + '/neo/' + type;
-  let pgUrl = BASE_URL + '/pg/' + type + '?page=0&perPage=2000'; // TODO: Make function paginated
+  let pgUrl = BASE_URL + '/pg/' + type + '?page=0&perPage=100'; // TODO: Make function paginated
 
   rp.del({ uri: neoUrl, json: true})
     .then(function(response) {
@@ -25,7 +30,6 @@ const migrateModels = (type) => {
                 console.log('Something went wrong inserting model.');
               }
             });
-
           }
         });
     });

@@ -13,13 +13,18 @@ const insert = (object) => {
     .then(r => manyMovies(r));
 }
 
-// Fuzzy matching title based on parts and lower case.
 const find = (identifier) => {
   return SESSION
     .run(`MATCH (movie:Movie) WHERE
-      movie.id = ${identifier} OR
-      movie.title =~ "(?i).*${identifier}.*" RETURN movie`)
-    .then(r => manyMovies(r));
+      movie.id = ${identifier} RETURN movie`)
+    .then(r => manyMovies(r)[0]);
+
+    // Fuzzy matching - see if we want to do this later.
+    // return SESSION
+    //   .run(`MATCH (movie:Movie) WHERE
+    //     movie.id = ${identifier} OR
+    //     movie.title =~ "(?i).*${identifier}.*" RETURN movie`)
+    //   .then(r => manyMovies(r));
 }
 
 const findAll = () => {

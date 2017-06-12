@@ -66,10 +66,7 @@ server.get('/migrate/:type', (req, res, next) => {
 server.post('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
   const currentDb = _getDatabase(database);
-
   if (_.isEmpty(req.body)) throw new Error(`Empty body submitted to insertion`);
-
-  console.log(req.body);
 
   insertModel(currentDb, type, req.body).then(results => {
     res.json(results);
@@ -110,6 +107,17 @@ server.get('/:database/:type/:id', (req, res, next) => {
   const currentDb = _getDatabase(database);
 
   find(currentDb, type, id).then(result => {
+    // console.log(`Result for ${type} ${id}:`, result);
+    res.json(result);
+  }).catch(next);
+});
+
+// Insert actor - movie relation by passing actor and movie id.
+server.post('/:database/actor/:actor/movies/:movie', (req, res, next) => {
+  const { database, actor, movie } = req.params;
+  const currentDb = _getDatabase(database);
+
+  insertMovieRole(currentDb, type, actor, movie).then(result => {
     // console.log(`Result for ${type} ${id}:`, result);
     res.json(result);
   }).catch(next);

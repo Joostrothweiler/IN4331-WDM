@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Actor = function (_node) {
   _.extend(this, _node.properties);
   if (this.id) {
-  	this.id = Number(this.id); // convert string to integer.
+    this.id = this.id.toNumber(); // conver low/high to single integer
   }
 };
 
