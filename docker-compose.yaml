@@ -20,13 +20,34 @@ services:
       - .:/var/www
     links:
       - postgres:postgres
-      - mongo:mongo
-  mongo:
-    image: mongo:3.0
+      - mongo1:mongo
+  mongo1:
+    image: mongo:3
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/mongo1:/data/db
     ports:
-      - "2223:27017"
+      - "22231:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
+  mongo2:
+    image: mongo:3
+    volumes:
+      - ./data/mongo2:/data/db
+    ports:
+      - "22232:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
+  mongo3:
+    image: mongo:3
+    volumes:
+      - ./data/mongo3:/data/db
+    ports:
+      - "22233:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
   neo4j:
     image: neo4j:3.2
     volumes:
@@ -36,3 +57,6 @@ services:
       - "2226:7474"
     environment:
       NEO4J_AUTH: none
+networks:
+  mongo:
+    driver: bridge
