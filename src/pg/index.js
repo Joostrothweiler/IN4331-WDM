@@ -3,13 +3,15 @@ const Models = require('./models');
 const typeMap = {
   movies: 'Movie',
   actors: 'Actor',
-  genres: 'Genre'
+  genres: 'Genre',
+  series: 'Series',
 };
 
 const assocMap = {
-  'movies': [ 'actors', 'genres' ],
+  'movies': [ 'actors', 'genres', 'series' ],
   'actors': [ 'movies' ],
-  'genres': [ ]
+  'genres': [ ],
+  'series': [ 'movies' ],
 };
 
 function _getModel(type) {
