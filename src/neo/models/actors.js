@@ -29,7 +29,7 @@ const insertMovieRole = (actorId, movieId) => {
           MATCH (movie:Movie) WHERE movie.id = ${movieId}
           CREATE (actor)-[:ACTED_IN]->(movie)
           RETURN actor`)
-    .then(r => singleActor(r));
+    .then(r => r);
 }
 
 const find = (identifier) => {
@@ -62,5 +62,6 @@ module.exports = {
   insert,
   find,
   findAll,
-  deleteAll
+  deleteAll,
+  insertMovieRole
 };

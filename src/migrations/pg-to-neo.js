@@ -17,30 +17,29 @@ const migrateModels = (type) => {
             const saveNeo = (key) => {
                 if (key < response.length) {
                     new Promise((resolve) => {
-                        setTimeout(100, resolve('success'))
+
+                        let model = response[key];
+
+                        request.post({url: neoUrl, form: model }, function(error, response, body) {
+                          if(!error && response.statusCode == 200) {
+                            resolve('success' + key);
+                          }
+                          else {
+                            console.log(model);
+                            console.log('Something went wrong inserting model.');
+                          }
+                        });
                     }).then(res => {
                         console.log(res)
                         saveNeo(key + 1)
                     })
                 }
             }
-          // for (var key in response) {
-          //   let model = response[key];
-          //
-          //   request.post({url: neoUrl, form: model }, function(error, response, body) {
-          //     if(!error && response.statusCode == 200) {
-          //       // console.log('Succesfully inserted model');
-          //     }
-          //     else {
-          //       console.log('Something went wrong inserting model.');
-          //     }
-          //   });
-          // }
+            console.log(response.length);
+            response.length > 0 && saveNeo(0);
         });
     });
 }
-
-
 
 migrateModels('movies');
 migrateModels('actors');
