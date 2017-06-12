@@ -3,12 +3,26 @@ const Models = require('./models');
 const typeMap = {
   movies: 'Movie',
   actors: 'Actor'
-}
+};
+
+const assocMap = {
+  'movies': [ 'actors' ],
+  'actors': [ 'movies' ]
+};
 
 function _getModel(type) {
   if (!(type in typeMap)) throw new Error(`'${type}' is not a valid model name.`);
   let key = typeMap[type];
   return Models[key];
+}
+
+function _mapIncludes(type) {
+  if (!(type in assocMap)) throw new Error(`'${type}' is not a valid model name.`);
+  return assocMap[type].map(assoc => {
+    return {
+      model: _getModel(assoc)
+    };
+  });
 }
 
 async function find(type, id) {
@@ -24,7 +38,8 @@ async function findAll(type, where = { }, page = 0, perPage = 10, orderby = 'id'
     where: Object.keys(where).length ? where : undefined,
     order: [[orderby, dir]],
     offset: page * perPage,
-    limit: perPage
+    limit: perPage,
+    include: _mapIncludes(type)
   });
 }
 
