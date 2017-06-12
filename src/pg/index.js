@@ -2,12 +2,14 @@ const Models = require('./models');
 
 const typeMap = {
   movies: 'Movie',
-  actors: 'Actor'
+  actors: 'Actor',
+  genres: 'Genre'
 };
 
 const assocMap = {
-  'movies': [ 'actors' ],
-  'actors': [ 'movies' ]
+  'movies': [ 'actors', 'genres' ],
+  'actors': [ 'movies' ],
+  'genres': [ ]
 };
 
 function _getModel(type) {
@@ -17,7 +19,7 @@ function _getModel(type) {
 }
 
 function _mapIncludes(type) {
-  if (!(type in assocMap)) throw new Error(`'${type}' is not a valid model name.`);
+  if (!(type in assocMap)) throw new Error(`'${type}' is not a valid association name.`);
   return assocMap[type].map(assoc => {
     return {
       model: _getModel(assoc)
