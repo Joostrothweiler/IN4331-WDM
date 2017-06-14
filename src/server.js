@@ -42,8 +42,8 @@ async function insertModel(db, type, object) {
   return db.insertModel(type, object);
 }
 
-async function insertMovieRole(db, actorId, movieId) {
-  return db.insertMovieRole(actorId, movieId);
+async function insertMovieRole(db, actorId, movieId, roles) {
+  return db.insertMovieRole(actorId, movieId, roles);
 }
 
 server.use(morgan('combined'));
@@ -103,9 +103,10 @@ server.get('/:database/:type/:id', (req, res, next) => {
 // Insert actor - movie relation by passing actor and movie id.
 server.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { database, actor, movie } = req.params;
+  const { roles } = req.query;
   const currentDb = _getDatabase(database);
 
-  insertMovieRole(currentDb, actor, movie).then(result => {
+  insertMovieRole(currentDb, actor, movie, roles).then(result => {
     res.json(result);
   }).catch(next);
 });

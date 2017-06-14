@@ -11,7 +11,7 @@ const typeMap = {
 };
 
 const assocMap = {
-  'movies': [ 'actors', 'genres', 'series', 'aka_titles', 'keywords' ],
+  'movies': [ 'actors', 'genres', /*'series', 'aka_titles', 'keywords'*/ ],
   'actors': [ 'movies', 'aka_names', 'series' ],
   'genres': [ 'movies', 'series' ],
   'keywords': [ 'movies', 'series' ],
@@ -19,6 +19,9 @@ const assocMap = {
   'aka_titles': [ 'movies' ],
   'aka_names': [ 'actors' ],
 };
+
+// actors: actors, movies, aka_names, series
+// movies: genres, series, aka_titles, keywords
 
 function _getModel(type) {
   if (!(type in typeMap)) throw new Error(`'${type}' is not a valid model name.`);
@@ -36,8 +39,13 @@ function _mapIncludes(type) {
 }
 
 async function find(type, id) {
-  let results = await findAll(type, { id });
-  return results[0];
+  console.log(`Finding ${type} by id ${id}`);
+
+  const Model = _getModel(type);
+  return Model.findOne({
+    where: { id: id},
+    include: _mapIncludes(type)
+  });
 }
 
 async function findAll(type, where = { }, page = 0, perPage = 10, orderby = 'id', dir = 'asc') {

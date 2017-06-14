@@ -3,7 +3,7 @@ const Actor = require('./neo4j/actor.js');
 
 
 const manyActors = (results) => {
-  return results.records.map(r => new Actor(r.get("actor")))
+  return results.records.map(r => new Actor(r.get("actor"), false))
 }
 
 const singleActor = (results) => {
@@ -23,11 +23,13 @@ const insert = (object) => {
     .then(r => singleActor(r));
 }
 
-const insertMovieRole = (actorId, movieId) => {
+const insertMovieRole = (actorId, movieId, roles) => {
+  roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
+
   return SESSION
     .run(`MATCH (actor:Actor) WHERE actor.id = ${actorId}
           MATCH (movie:Movie) WHERE movie.id = ${movieId}
-          CREATE (actor)-[:ACTED_IN]->(movie)
+          CREATE (actor)-[:ACTED_IN {roles:['${roles}']}]->(movie)
           RETURN actor`)
     .then(r => r);
 }
