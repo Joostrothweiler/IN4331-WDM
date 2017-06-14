@@ -19,17 +19,16 @@ const singleMovie = (results) => {
   if (results.records.length == 0) {
     return
   }
-  let movie = new Movie(results.records[0].get('movie'));
-  movie.actors = [];
-  // movie.genres = []; // TODO: First insert in db and then also here
-  // movie.keywords = []; // TODO: First insert in db and then also here
+  let movie = new Movie(results.records[0].get('movie'), false);
 
+  // Fetch all relationships and insert based on relationMap.
   results.records.map(res => {
-    if(realtionType = relationMap[res.get('relationship').type]) {
+    if(relationType = relationMap[res.get('relationship').type]) {
+      movie[relationType.field] = movie[relationType.field] || [];
 
-      let relationObject = new realtionType.model(res.get('n'));
-      relationObject[realtionType.properties] = res.get('relationship').properties[realtionType.properties];
-      movie[realtionType.field].push(relationObject);
+      let relationObject = new relationType.model(res.get('n'));
+      relationObject[relationType.properties] = res.get('relationship').properties[relationType.properties];
+      movie[relationType.field].push(relationObject);
 
     }
   })
