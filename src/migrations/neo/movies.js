@@ -2,26 +2,26 @@ const request = require('request');
 const rp = require('request-promise');
 const {BASE_URL} = require('../../config');
 
-async function deleteNeoModels(type) {
+async function deleteModels(db, type) {
   return rp.del({
-    url: BASE_URL + `/neo/${type}`,
+    url: BASE_URL + `/${db}/${type}`,
     json: true
   });
 }
 
-async function insertNeoModel(type, model) {
+async function insertModel(db, type, model) {
   return rp.post({
-    url: BASE_URL + `/neo/${type}`,
+    url: BASE_URL + `/${db}/${type}`,
     form: model,
     json: true
   })
   console.log('inserted model')
 }
 
-async function insertNeoRole(actor, movie, roles) {
+async function insertRole(db, actor, movie, roles) {
   let urlEnd = roles == null ? '' :  `?roles="${encodeURIComponent(roles)}"`;
   return rp.post({
-    url: BASE_URL + `/neo/actors/${actor}/movies/${movie}` + urlEnd,
+    url: BASE_URL + `/${db}/actors/${actor}/movies/${movie}` + urlEnd,
     json: true
   })
   console.log('inserted role')
@@ -66,7 +66,7 @@ async function migrateMovies() {
         delete movie.actors;
         delete movie.genres;
 
-        await insertNeoModel('movies', movie);
+        await insertModel('neo', 'movies', movie);
 
         for (let key in actors) {
           const actor = actors[key];
@@ -75,11 +75,11 @@ async function migrateMovies() {
             // Not inserting actor with id = actor.id - Already in database
           } else {
             // Actor not yet in database - insert
-            await insertNeoModel('actors', actor);
+            await insertModel('neo', 'actors', actor);
             actors_inserted_ids.push(actor.id);
           }
 
-          let res = await insertNeoRole(actor.id, movie.id, actor.acted_in.character);
+          let res = await insertRole('neo', actor.id, movie.id, actor.acted_in.character);
         }
         // Repeat loop for genres.
       }
