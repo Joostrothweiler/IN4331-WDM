@@ -13,6 +13,8 @@ function _getModel(type) {
 }
 
 async function insertModel(type, object) {
+  object._id = object.id
+
   console.log(`Inserting ${type}`);
   const Model = _getModel(type);
   return Model.create(object);
@@ -35,10 +37,16 @@ async function find(type, id) {
   return Model.findOne({'_id' : id});
 }
 
-async function findAll(type, page = 0, perPage = 10) {
+async function findAll(type, where, page = 0, perPage = 10, orderBy, dir) {
+  console.log(orderBy)
+  orderBy = (orderBy == 'id' || orderBy == undefined) ? '_id' : orderBy;
+  dir = dir == 'desc' ? -1 : 1;
+
+
   console.log(`Finding ${type} page ${page} per ${perPage}`);
   const Model = _getModel(type);
-  return Model.find({});
+  console.log(perPage)
+  return Model.find().skip(page).limit(perPage).sort({orderBy: dir});
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {

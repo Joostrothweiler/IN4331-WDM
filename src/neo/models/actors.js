@@ -45,7 +45,7 @@ const insert = (object) => {
         gender: "${object.gender}",
         number: "${object.number}"
       }) RETURN actor`)
-    .then(r => singleActor(r));
+    .then(r => manyActors(r)[0]);
 }
 
 const insertMovieRole = (actorId, movieId, roles) => {
