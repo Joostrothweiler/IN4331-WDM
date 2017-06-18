@@ -49,6 +49,7 @@ const insert = (object) => {
 }
 
 const insertMovieRole = (actorId, movieId, roles) => {
+  // FIXME: Do we actually want to be able to store multiple roles for movie->actor relation?
   roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
 
   return SESSION

@@ -7,14 +7,6 @@ const movieSchema = new Schema({
   _id: Number, // We already know the id so do not let mongo create it.
   title: String,
   year: Number,
-  actor_ids: [
-    {
-      id: Number,
-      roles: [
-        String
-      ]
-    }
-  ],
   genre_ids: [ Number ]
 });
 

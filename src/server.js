@@ -108,6 +108,8 @@ server.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { roles } = req.query;
   const currentDb = _getDatabase(database);
 
+  console.log(movie)
+
   insertMovieRole(currentDb, actor, movie, roles).then(result => {
     res.json(result);
   }).catch(next);

@@ -18,15 +18,16 @@ async function insertModel(type, object) {
   return Model.create(object);
 }
 
-const insertMovieRole = (actorId, movieId, roles) => {
+async function insertMovieRole(actorId, movieId, roles) {
+  // FIXME: Do we actually want to be able to store multiple roles for movie->actor relation?
   roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
 
-  return SESSION
-    .run(`MATCH (actor:Actor) WHERE actor.id = ${actorId}
-          MATCH (movie:Movie) WHERE movie.id = ${movieId}
-          CREATE (actor)-[:ACTED_IN {roles:['${roles}']}]->(movie)
-          RETURN actor`)
-    .then(r => r);
+  let movie = await find('movies', movieId);
+  let actor = await find('actors', actorId);
+
+  // TODO: Should this also be inserted into movies?
+  actor.movie_ids.push({ _id: movie._id, 'roles': [roles]});
+  return await actor.save();
 }
 
 async function find(type, id) {
@@ -49,5 +50,7 @@ async function deleteAll(type, page = 0, perPage = 10) {
 module.exports = {
   findAll,
   find,
-  insertModel
+  insertModel,
+  insertMovieRole,
+  deleteAll
 };
