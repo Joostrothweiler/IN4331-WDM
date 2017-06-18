@@ -7,10 +7,12 @@ const { SERVER_PORT } = require('./config');
 
 const PG = require('./pg');
 const NEO = require('./neo');
+const MONGO = require('./mongo')
 
 const databaseMap = {
   'pg': PG,
-  'neo': NEO
+  'neo': NEO,
+  'mongo': MONGO
 }
 
 function _getDatabase(db) {
