@@ -4,10 +4,15 @@ const rp = require('request-promise');
 const { BASE_URL } = require('../config');
 
 async function deleteModels(db, type) {
-  return rp.del({
-    url: BASE_URL + `/${db}/${type}`,
-    json: true
-  });
+  if(db == 'pg') {
+    console.log('Not removing from PG!');
+  }
+  else {
+    return rp.del({
+      url: BASE_URL + `/${db}/${type}`,
+      json: true
+    });
+  }
 }
 
 async function insertModel(db, type, model) {
@@ -35,17 +40,63 @@ async function fetchMovies(db, page, perPage) {
   })
 }
 
-async function fetchMovie(db, id) {
+async function fetchModel(db, type, id) {
   return rp.get({
-    url: BASE_URL + `/${db}/movies/${id}`,
+    url: BASE_URL + `/${db}/${type}/${id}`,
     json: true
   })
 }
 
+async function migrateMovies(migrationDb) {
+  let actors_inserted_ids = [];
+  let genres_inserted_ids = [];
+
+  const perPage = 300;
+  const numberOfPages = 1000;
+
+  for (let page = 0; page < numberOfPages; page++) {
+    console.log('Fetching next');
+    let movies = await fetchMovies('pg', page, perPage);
+    console.log(`Processing page ${page}/${numberOfPages} with ${perPage} movies per page.`);
+
+    for (let i = 0; i < movies.length; i++) {
+      let movie = movies[i];
+      console.log(`${migrationDb}: migrating movie ${i}`);
+      // Check if not already inserted
+      let nextMovie = await fetchModel(migrationDb, 'movies', movie.id);
+
+      if(nextMovie == undefined || nextMovie == null) {
+        let actors = movie.actors;
+
+        // Send only the plain movie object with request.
+        delete movie.actors;
+        delete movie.genres;
+
+        await insertModel(migrationDb, 'movies', movie);
+
+        for (let key in actors) {
+          const actor = actors[key];
+
+          if (actors_inserted_ids.indexOf(actor.id) > -1) {
+            // Not inserting actor with id = actor.id - Already in database
+          } else {
+            let actorExists = await fetchModel(migrationDb, 'actors', actor.id);
+            if(actorExists == undefined || actorExists == null) {
+              await insertModel(migrationDb, 'actors', actor);
+              actors_inserted_ids.push(actor.id);
+            }
+          }
+
+          let res = await insertRole(migrationDb, actor.id, movie.id, actor.acted_in.character);
+        }
+        // Repeat loop for genres.
+      }
+    }
+  }
+  console.log('done')
+}
+
 module.exports = {
   deleteModels,
-  insertModel,
-  insertRole,
-  fetchMovies,
-  fetchMovie
+  migrateMovies
 }

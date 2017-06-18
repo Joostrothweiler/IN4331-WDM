@@ -1,4 +1,5 @@
 const Models = require('./models');
+const _ = require('lodash');
 
 const typeMap = {
   movies: 'Movie',
@@ -27,8 +28,12 @@ async function insertMovieRole(actorId, movieId, roles) {
   let movie = await find('movies', movieId);
   let actor = await find('actors', actorId);
 
-  // TODO: Should this also be inserted into movies?
-  actor.movie_ids.push({ _id: movie._id, 'roles': [roles]});
+  if (_.some(actor.movie_ids, { _id: movie._id})) {
+    console.log('already exists a role with this id. Not inserting');
+  }
+  else {
+    actor.movie_ids.push({ _id: movie._id, 'roles': [roles]});
+  }
   return await actor.save();
 }
 
