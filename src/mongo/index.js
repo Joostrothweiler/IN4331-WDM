@@ -37,16 +37,13 @@ async function find(type, id) {
   return Model.findOne({'_id' : id});
 }
 
-async function findAll(type, where, page = 0, perPage = 10, orderBy, dir) {
-  console.log(orderBy)
-  orderBy = (orderBy == 'id' || orderBy == undefined) ? '_id' : orderBy;
-  dir = dir == 'desc' ? -1 : 1;
+async function findAll(type, where, page = 0, perPage = 10, orderby, dir) {
+  orderby = (orderby == 'id' || orderby == undefined) ? '_id' : orderby;
 
-
-  console.log(`Finding ${type} page ${page} per ${perPage}`);
+  console.log(`Finding ${type} page ${page} per ${perPage} orderby ${orderby} ${dir}`);
   const Model = _getModel(type);
   console.log(perPage)
-  return Model.find().skip(page).limit(perPage).sort({orderBy: dir});
+  return Model.find().sort([[orderby, dir]]).skip(page).limit(perPage);
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {
