@@ -59,7 +59,7 @@ const find = (identifier) => {
 // get all movies
 const findAll = (where, page, perPage, orderby, dir) => {
   return SESSION
-    .run(`MATCH (genre:Genre) RETURN genre ORDER BY genre.${orderby} ${dir} SKIP ${Math.max(0,page-1)*perPage} LIMIT ${perPage}`)
+    .run(`MATCH (genre:Genre) RETURN genre ORDER BY genre.${orderby} ${dir} SKIP ${page*perPage} LIMIT ${perPage}`)
     .then(r => manyGenres(r));
 };
 

@@ -74,7 +74,7 @@ const find = (identifier) => {
 
 const findAll = (where, page, perPage, orderby, dir) => {
   return SESSION
-    .run(`MATCH (actor:Actor) RETURN actor.id ORDER BY actor.${orderby} ${dir} SKIP ${Math.max(0,page-1)*perPage} LIMIT ${perPage}`)
+    .run(`MATCH (actor:Actor) RETURN actor.id ORDER BY actor.${orderby} ${dir} SKIP ${page*perPage} LIMIT ${perPage}`)
     .then(r => {
       ids = r.records.map(a => a.get('actor.id').low)
       return SESSION
