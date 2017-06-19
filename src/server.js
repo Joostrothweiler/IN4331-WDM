@@ -4,21 +4,7 @@ const bodyParser = require('body-parser');
 const _ = require('lodash');
 
 const { SERVER_PORT } = require('./config');
-
-const PG = require('./pg');
-const NEO = require('./neo');
-const MONGO = require('./mongo')
-
-const databaseMap = {
-  'pg': PG,
-  'neo': NEO,
-  'mongo': MONGO
-}
-
-function _getDatabase(db) {
-  if (!(db in databaseMap)) throw new Error(`'${db}' is not a valid database name.`);
-  return databaseMap[db];
-}
+const ORM = require('./orm');
 
 const server = express();
 
@@ -26,38 +12,16 @@ server.use(bodyParser.urlencoded({
   extended: true
 }));
 
-async function findAll(db, type, options) {
-  const { where, page, perPage, orderby, dir } = options;
-  return db.findAll(type, where, page, perPage, orderby, dir);
-}
-
-async function deleteAll(db, type, options) {
-  const { where, page, perPage } = options;
-  return db.deleteAll(type, where, page, perPage);
-}
-
-async function find(db, type, id) {
-  return db.find(type, id);
-}
-
-async function insertModel(db, type, object) {
-  return db.insertModel(type, object);
-}
-
-async function insertMovieRole(db, actorId, movieId, roles) {
-  return db.insertMovieRole(actorId, movieId, roles);
-}
-
 server.use(morgan('combined'));
+
 // Disable favicon
 server.get('/favicon.ico', (req, res, next) => res.status(404).end());
 
 server.post('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
-  const currentDb = _getDatabase(database);
   if (_.isEmpty(req.body)) throw new Error(`Empty body submitted to insertion`);
 
-  insertModel(currentDb, type, req.body).then(results => {
+  ORM.insertModel(database, type, { model: req.body }).then(results => {
     res.json(results);
   }).catch(next);
 });
@@ -65,7 +29,6 @@ server.post('/:database/:type', (req, res, next) => {
 server.get('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
   const { page = 0, perPage = 10, dir = 'asc', orderby = 'id'} = req.query;
-  const currentDb = _getDatabase(database);
 
   let where = Object.assign({}, req.query);
   delete where.page;
@@ -73,7 +36,7 @@ server.get('/:database/:type', (req, res, next) => {
   delete where.dir;
   delete where.orderby;
 
-  findAll(currentDb, type, { where, page, perPage, orderby, dir }).then(results => {
+  ORM.findAll(database, type, { where, page, perPage, orderby, dir }).then(results => {
     res.json(results);
   }).catch(next);
 });
@@ -82,22 +45,28 @@ server.get('/:database/:type', (req, res, next) => {
 server.delete('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
   const { page = 0, perPage = 10 } = req.query;
-  const currentDb = _getDatabase(database);
 
   let where = Object.assign({}, req.query);
   delete where.page;
   delete where.perPage;
 
-  deleteAll(currentDb, type, { where, page, perPage }).then(results => {
+  ORM.deleteAll(database, type, { where, page, perPage }).then(results => {
     res.json(results);
   }).catch(next);
 });
 
 server.get('/:database/:type/:id', (req, res, next) => {
   const { database, type, id } = req.params;
-  const currentDb = _getDatabase(database);
 
-  find(currentDb, type, id).then(result => {
+  ORM.find(database, type, { id }).then(result => {
+    res.json(result);
+  }).catch(next);
+});
+
+server.get('/:database/:type/:id/:tail', (req, res, next) => {
+  const { database, type, id, tail } = req.params;
+
+  ORM.find(database, type, { id, tail }).then(result => {
     res.json(result);
   }).catch(next);
 });
@@ -106,11 +75,10 @@ server.get('/:database/:type/:id', (req, res, next) => {
 server.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { database, actor, movie } = req.params;
   const { roles } = req.query;
-  const currentDb = _getDatabase(database);
 
   console.log(movie)
 
-  insertMovieRole(currentDb, actor, movie, roles).then(result => {
+  ORM.insertMovieRole(database, actor, movie, roles).then(result => {
     res.json(result);
   }).catch(next);
 });
