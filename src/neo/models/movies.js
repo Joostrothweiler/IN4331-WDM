@@ -45,6 +45,10 @@ const insert = (object) => {
     .then(r => manyMovies(r)[0]);
 }
 
+const insertGenre = (movieId, genreId) => {
+  return `movie: ${movieId}, genre: ${genreId}.`;
+}
+
 const find = (identifier) => {
   return SESSION
     .run(`MATCH (movie:Movie {id: ${identifier}})-[relationship]-(n) RETURN movie, relationship, n`)
@@ -70,6 +74,7 @@ const deleteAll = () => {
 
 module.exports = {
   insert,
+  insertGenre,
   find,
   findAll,
   deleteAll

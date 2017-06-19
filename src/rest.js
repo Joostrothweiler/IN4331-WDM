@@ -92,4 +92,12 @@ router.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   }).catch(next);
 });
 
+router.post('/:database/movies/:movie/genres/:genre', (req, res, next) => {
+  const { database, movie, genre } = req.params;
+
+ORM.insertGenre(database, movie, genre).then(result => {
+    res.json(result);
+  }).catch(next);
+});
+
 module.exports = router;

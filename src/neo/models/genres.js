@@ -3,7 +3,17 @@ const Genre = require('./neo4j/genre.js');
 
 
 const manyGenres = (results) => {
-  return results.records.map(r => new Genre(r.get('genre')))
+  return results.records.map(r => new Genre(r.get('genre')));
+}
+
+const insert = (object) => {
+  console.log(object.genre)
+  return SESSION
+    .run(`CREATE (genre:Genre {
+        id: ${object.id},
+        genre: '${object.genre}'
+      }) RETURN genre`)
+    .then(r => manyGenres(r)[0]);
 }
 
 // get all movies
@@ -14,5 +24,6 @@ const findAll = () => {
 };
 
 module.exports = {
-  findAll
+  findAll,
+  insert
 };

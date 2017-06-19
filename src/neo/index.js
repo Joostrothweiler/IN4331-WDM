@@ -2,7 +2,8 @@ const Models = require('./models');
 
 const typeMap = {
   movies: 'Movie',
-  actors: 'Actor'
+  actors: 'Actor',
+  'genres': 'Genre'
 }
 
 function _getModel(type) {
@@ -21,6 +22,12 @@ async function insertMovieRole(actorId, movieId, roles) {
   console.log(`Actor: ${actorId}. Movie: ${movieId}`);
   const Model = _getModel('actors');
   return Model.insertMovieRole(actorId, movieId, roles);
+}
+
+async function insertGenre(movieId, genreId) {
+  console.log(`Genre: ${genreId}, Movie: ${movieId}`);
+  const Model = _getModel('movies');
+  return Model.insertGenre(movieId, genreId);
 }
 
 async function find(type, identifier) {
@@ -44,6 +51,7 @@ async function deleteAll(type, page = 0, perPage = 10) {
 
 module.exports = {
   insertModel,
+  insertGenre,
   findAll,
   find,
   deleteAll,

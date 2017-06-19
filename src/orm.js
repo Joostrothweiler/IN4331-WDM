@@ -46,10 +46,15 @@ async function insertMovieRole(db, actorId, movieId, role) {
   return database.insertMovieRole(actorId, movieId, role);
 }
 
+async function insertGenre(db, movieId, genreId) {
+  return db.insertGenre(movieId, genreId);
+}
+
 module.exports = {
   findAll,
   deleteAll,
   find,
   insertModel,
-  insertMovieRole
+  insertMovieRole,
+  insertGenre
 }
