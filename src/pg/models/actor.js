@@ -14,5 +14,4 @@ const Actor = connection.define('actors', {
   number: Sequelize.INTEGER,
 }, { timestamps: false });
 
-
 module.exports = Actor;

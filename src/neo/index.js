@@ -17,10 +17,10 @@ async function insertModel(type, object) {
   return Model.insert(object);
 }
 
-async function insertMovieRole(actorId, movieId) {
+async function insertMovieRole(actorId, movieId, roles) {
   console.log(`Actor: ${actorId}. Movie: ${movieId}`);
   const Model = _getModel('actors');
-  return Model.insertMovieRole(actorId, movieId);
+  return Model.insertMovieRole(actorId, movieId, roles);
 }
 
 async function find(type, identifier) {
