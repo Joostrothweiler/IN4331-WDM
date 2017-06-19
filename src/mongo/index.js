@@ -4,7 +4,6 @@ const _ = require('lodash');
 const typeMap = {
   movies: 'Movie',
   actors: 'Actor',
-  genres: 'Genre'
 }
 
 function _getModel(type) {
@@ -16,26 +15,22 @@ function _getModel(type) {
 async function insertModel(type, object) {
   object._id = object.id;
 
-  console.log(object);
-  console.log(`Inserting ${type}`);
   const Model = _getModel(type);
   return Model.create(object);
 }
 
-async function insertMovieRole(actorId, movieId, roles) {
-  // FIXME: Do we actually want to be able to store multiple roles for movie->actor relation?
-  roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
+async function insertMovieRole(actorId, movieId, role) {
+  const character = role ? decodeURIComponent(role).replace(/["'()]/g,"") : null;
 
   let movie = await find('movies', movieId);
   let actor = await find('actors', actorId);
 
-  if (_.some(actor.movie_ids, { _id: movie._id})) {
-    console.log('already exists a role with this id. Not inserting');
+  if (!_.some(actor.movie_ids, { _id: movie._id})) {
+    actor.movie_ids.push({ _id: movie._id, 'role': character });
+    movie.actor_ids.push({ _id: actor._id, 'role': character });
+    await actor.save();
+    await movie.save();
   }
-  else {
-    actor.movie_ids.push({ _id: movie._id, 'roles': [roles]});
-  }
-  return await actor.save();
 }
 
 async function find(type, id) {
@@ -43,13 +38,22 @@ async function find(type, id) {
   return Model.findOne({'_id' : id});
 }
 
-async function findAll(type, where, page = 0, perPage = 10, orderby, dir) {
-  orderby = (orderby == 'id' || orderby == undefined) ? '_id' : orderby;
+async function findAll(type, where = {}, page = 0, perPage = 10, orderby, dir) {
+  const order = (orderby === 'id' || !orderby ) ? '_id' : orderby;
+  const direction = dir === 'asc' ? 1 : dir === 'desc' ? -1 : 1;
+  const amount = Number.isInteger(perPage) ? perPage : Number.parseInt(perPage);
+  const skip = Number.isInteger(page) ? page : Number.parseInt(page);
 
-  console.log(`Finding ${type} page ${page} per ${perPage} orderby ${orderby} ${dir}`);
+  const { year, yearTo } = where;
+  if (yearTo && year) {
+    where.year = { $gte: year, $lte: yearTo}
+    delete where.yearTo
+  }
+  console.log(where)
+
+  console.log(`Finding ${type} page ${skip} per ${amount} orderby ${order} ${direction}`);
   const Model = _getModel(type);
-  console.log(perPage);
-  return Model.find().sort([[orderby, dir]]).skip(page).limit(perPage);
+  return Model.find(where).sort([[order, direction]]).skip(skip).limit(amount);
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {

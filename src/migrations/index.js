@@ -6,14 +6,14 @@ async function migrate(deleteFirst = false) {
     await API_HELPERS.deleteModels('mongo', 'actors');
     console.log('Deleted mongo models');
 
-    await API_HELPERS.deleteModels('neo', 'movies');
-    await API_HELPERS.deleteModels('neo', 'actors');
+    // await API_HELPERS.deleteModels('neo', 'movies');
+    // await API_HELPERS.deleteModels('neo', 'actors');
     console.log('Deleted neo models');
   }
 
   API_HELPERS.migrateMovies('mongo');
-  API_HELPERS.migrateMovies('neo');
+  // API_HELPERS.migrateMovies('neo');
 }
 
 // removeOld();
-migrate(false);
+migrate(true);

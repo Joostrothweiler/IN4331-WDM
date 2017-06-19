@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const { CONNECTION } = require('../connection.js');
 const Schema = mongoose.Schema;
 
+const Actors = require('./actors');
+
 // Create a schema
 const movieSchema = new Schema({
   _id: Number, // We already know the id so do not let mongo create it.
@@ -10,8 +12,8 @@ const movieSchema = new Schema({
   genres: [ String ],
   keywords: [ String ],
   actor_ids: [{
-    _id: { type: mongoose.Schema.Types.Number, ref: 'Movies' },
-    roles: [ String ],
+    _id: { type: mongoose.Schema.Types.Number, ref: 'Actors' },
+    role: String,
   }]
 });
 
