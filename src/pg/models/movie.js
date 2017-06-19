@@ -8,7 +8,7 @@ const Movie = connection.define('movies', {
     type: Sequelize.STRING
   },
   title: Sequelize.STRING,
-  year: Sequelize.DATE,
+  year: Sequelize.INTEGER,
   number: Sequelize.INTEGER,
   type: Sequelize.STRING,
   location: Sequelize.STRING,

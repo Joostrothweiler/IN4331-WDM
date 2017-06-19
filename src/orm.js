@@ -14,11 +14,11 @@ function _getDatabase(db) {
   return databaseMap[db];
 }
 
-async function findAll(db, type, options) {
+async function findAll(db, type, options, context) {
   const database = _getDatabase(db);
-  const { where, page, perPage, orderby, dir } = options;
+  const { where, page, perPage, order, groupby, dir, include } = options;
 
-  return database.findAll(type, where, page, perPage, orderby, dir);
+  return database.findAll(type, where, page, perPage, order, groupby, dir, include);
 }
 
 async function deleteAll(db, type, options) {
@@ -30,9 +30,7 @@ async function deleteAll(db, type, options) {
 
 async function find(db, type, options) {
   const database = _getDatabase(db);
-  const { id, tail } = options;
-
-  return database.find(type, id, tail);
+  return database.find(type, options);
 }
 
 async function insertModel(db, type, options) {
