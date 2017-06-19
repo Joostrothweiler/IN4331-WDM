@@ -29,10 +29,10 @@ async function find(type, identifier) {
   return Model.find(identifier);
 }
 
-async function findAll(type, page = 0, perPage = 10) {
+async function findAll(type, where, page = 0, perPage = 10, orderby, dir) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
   const Model = _getModel(type);
-  return Model.findAll();
+  return Model.findAll(where, page, perPage, orderby, dir);
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {
