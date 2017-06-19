@@ -10,29 +10,31 @@ const relationMap = {
   }
 }
 
+// TODO: Return normal error message saying no movies found.
 const manyActors = (results) => {
-  return results.records.map(r => new Actor(r.get("actor"), false))
-}
+  let actors = [];
+  let actor = {};
 
-const singleActor = (results) => {
-  if (results.records.length == 0) {
-    return
-  }
-  let actor = new Actor(results.records[0].get('actor'), false);
+  results.records.map(record => {
+    let recordActor = new Actor(record.get('actor'), false);
 
-  // Fetch all relationships and insert based on relationMap.
-  results.records.map(res => {
-    if(relationType = relationMap[res.get('relationship').type]) {
+    if(recordActor.id != actor.id) {
+      if(actor.id != undefined) {
+        actors.push(actor);
+      }
+      actor = recordActor;
+    }
+
+    if(relationType = relationMap[record.get('relationship').type]) {
       actor[relationType.field] = actor[relationType.field] || [];
 
-      let relationObject = new relationType.model(res.get('n'));
-      relationObject[relationType.properties] = res.get('relationship').properties[relationType.properties];
+      let relationObject = new relationType.model(record.get('n'));
+      relationObject[relationType.properties] = record.get('relationship').properties[relationType.properties];
       actor[relationType.field].push(relationObject);
-
     }
   })
-  actor.number_of_movies_played_in = actor.movies.length;
-  return actor;
+  actors.push(actor)
+  return actors
 }
 
 const insert = (object) => {
@@ -63,13 +65,18 @@ const insertMovieRole = (actorId, movieId, roles) => {
 const find = (identifier) => {
   return SESSION
     .run(`MATCH (actor:Actor {id: ${identifier}})-[relationship]-(n) RETURN actor, relationship, n`)
-    .then(r => singleActor(r));
+    .then(r => manyActors(r)[0]);
 }
 
-const findAll = () => {
+const findAll = (where, page, perPage, orderby, dir) => {
   return SESSION
-    .run(`MATCH (actor:Actor) RETURN actor`)
-    .then(r => manyActors(r));
+    .run(`MATCH (actor:Actor) RETURN actor.id SKIP ${Math.max(0,page-1)*perPage} LIMIT ${perPage}`)
+    .then(r => {
+      ids = r.records.map(a => a.get('actor.id').low)
+      return SESSION
+        .run(`MATCH (actor:Actor)-[relationship]-(n) WHERE actor.id IN [${ids}] RETURN actor, relationship, n`)
+        .then(r => manyActors(r))
+    });
 };
 
 const deleteAll = () => {
