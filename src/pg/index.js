@@ -1,3 +1,4 @@
+const connection = require('./connection');
 const Models = require('./models');
 
 const typeMap = {
@@ -23,6 +24,16 @@ const assocMap = {
 // actors: actors, movies, aka_names, series
 // movies: genres, series, aka_titles, keywords
 
+function stats(actor) {
+  let { fname, mname, lname, movies: { length: movies_count } } = actor;
+  let name = [ fname, mname, lname ].filter(x => x).join(' ');
+
+  return {
+    name,
+    movies_count
+  };
+}
+
 function _getModel(type) {
   if (!(type in typeMap)) throw new Error(`'${type}' is not a valid model name.`);
   let key = typeMap[type];
@@ -40,10 +51,34 @@ function _mapIncludes(type) {
 
 async function find(type, id) {
   console.log(`Finding ${type} by id ${id}`);
-
   const Model = _getModel(type);
+
+
+  // if (Model === Models.Actor && tail === 'stats') {
+  //   return Model.findOne({
+  //     // attributes: {
+  //     //   include: [
+  //     //     // [ connection.fn('COUNT', 'movies'), 'movies_count' ]
+  //     //   ]
+  //     // },
+  //     attributes: [
+  //       'id',
+  //       'fname',
+  //       'lname',
+  //       'mname',
+  //       // [ connection.fn('COUNT', 'movies'), 'movies_count' ]
+  //     ],
+  //     where: { id: id },
+  //     // group: ['actors.idactors', 'movies.acted_in.idacted_in'],
+  //     // raw: true,
+  //     include: [
+  //       { model: Models.Movie, attributes: [ 'id' ] }
+  //     ]
+  //   }).then();
+  // }
+
   return Model.findOne({
-    where: { id: id},
+    where: { id: id },
     include: _mapIncludes(type)
   });
 }
