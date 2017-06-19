@@ -1,26 +1,70 @@
 version: "2"
 services:
-  postgres:
-    image: postgres:9.6
-    ports:
-      - "2224:5432"
-    volumes:
-      - ./data/pg:/var/lib/postgresql/data
+#  postgres:
+#    image: postgres:9.6
+#    ports:
+#      - "2224:5432"
+#    volumes:
+#      - ./data/pg:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_USER: postgres
+#      POSTGRES_DB: wdm
+#    networks:
+#      - "postgres"
+  pg-master:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
       POSTGRES_DB: wdm
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+    volumes:
+      - ./data/pgm:/var/lib/postgresql/data
+    ports:
+      - "22241:5432"
+    networks:
+      - 'postgres'
+  pg-slave1:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+      REPLICATE_FROM: 'pg-master'
+    volumes:
+      - ./data/pgs1:/var/lib/postgresql/data
+    networks:
+      - 'postgres'
+    ports:
+      - "22242:5432"
+  pg-slave2:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+      REPLICATE_FROM: 'pg-master'
+    volumes:
+      - ./data/pgs2:/var/lib/postgresql/data
+    ports:
+      - "22243:5432"
+    networks:
+      - 'postgres'
   server:
     build:
       context: .
-    command: "npm run dev"
+    command: "npm run start"
     ports:
       - "2222:3000"
     volumes:
       - .:/var/www
-    links:
-      - postgres:postgres
-      - mongo1:mongo
+    networks:
+      - "mongo"
+      - "postgres"
   mongo1:
     image: mongo:3
     volumes:
@@ -59,4 +103,6 @@ services:
       NEO4J_AUTH: none
 networks:
   mongo:
+    driver: bridge
+  postgres:
     driver: bridge
