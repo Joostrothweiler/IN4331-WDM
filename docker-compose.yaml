@@ -1,32 +1,99 @@
 version: "2"
 services:
-  postgres:
-    image: postgres:9.6
-    ports:
-      - "2224:5432"
-    volumes:
-      - ./data/pg:/var/lib/postgresql/data
+#  postgres:
+#    image: postgres:9.6
+#    ports:
+#      - "2224:5432"
+#    volumes:
+#      - ./data/pg:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_USER: postgres
+#      POSTGRES_DB: wdm
+#    networks:
+#      - "postgres"
+  pg-master:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
       POSTGRES_DB: wdm
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+    volumes:
+      - ./data/pgm:/var/lib/postgresql/data
+    ports:
+      - "22241:5432"
+    networks:
+      - 'postgres'
+  pg-slave1:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+      REPLICATE_FROM: 'pg-master'
+    volumes:
+      - ./data/pgs1:/var/lib/postgresql/data
+    networks:
+      - 'postgres'
+    ports:
+      - "22242:5432"
+  pg-slave2:
+    image: 'danieldent/postgres-replication'
+    restart: 'always'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      PGDATA: '/var/lib/postgresql/data'
+      REPLICATE_FROM: 'pg-master'
+    volumes:
+      - ./data/pgs2:/var/lib/postgresql/data
+    ports:
+      - "22243:5432"
+    networks:
+      - 'postgres'
   server:
     build:
       context: .
-    command: "npm run dev"
+    command: "npm run start"
+    restart: 'always'
     ports:
       - "2222:3000"
     volumes:
       - .:/var/www
-    links:
-      - postgres:postgres
-      - mongo:mongo
-  mongo:
-    image: mongo:3.0
+    networks:
+      - "mongo"
+      - "postgres"
+      - "neo4j"
+  mongo1:
+    image: mongo:3
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/mongo1:/data/db
     ports:
-      - "2223:27017"
+      - "22231:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
+  mongo2:
+    image: mongo:3
+    volumes:
+      - ./data/mongo2:/data/db
+    ports:
+      - "22232:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
+  mongo3:
+    image: mongo:3
+    volumes:
+      - ./data/mongo3:/data/db
+    ports:
+      - "22233:27017"
+    networks:
+      - "mongo"
+    command: "mongod --replSet mongo-replication --smallfiles"
   neo4j:
     image: neo4j:3.2
     volumes:
@@ -36,3 +103,12 @@ services:
       - "2226:7474"
     environment:
       NEO4J_AUTH: none
+    networks:
+      - "neo4j"
+networks:
+  mongo:
+    driver: bridge
+  postgres:
+    driver: bridge
+  neo4j:
+    driver: bridge
