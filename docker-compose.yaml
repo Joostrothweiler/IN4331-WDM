@@ -66,6 +66,7 @@ services:
     networks:
       - "mongo"
       - "postgres"
+      - "neo4j"
   mongo1:
     image: mongo:3
     volumes:
@@ -102,8 +103,12 @@ services:
       - "2226:7474"
     environment:
       NEO4J_AUTH: none
+    networks:
+      - "neo4j"
 networks:
   mongo:
     driver: bridge
   postgres:
+    driver: bridge
+  neo4j:
     driver: bridge
