@@ -58,6 +58,7 @@ services:
     build:
       context: .
     command: "npm run start"
+    restart: 'always'
     ports:
       - "2222:3000"
     volumes:
