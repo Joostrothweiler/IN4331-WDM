@@ -6,6 +6,7 @@ const {
   POSTGRES_URL = 'postgres://postgres:postgres@postgres:5432/',
   NEO_URL = 'bolt://neo4j',
   BASE_URL = 'http://localhost:2222',
+  MONGO_URL = 'mongo'
 } = process.env;
 
 module.exports = {
@@ -13,5 +14,6 @@ module.exports = {
     POSTGRES_URL,
     POSTGRES_DBNAME,
     NEO_URL,
-    BASE_URL
+    BASE_URL,
+    MONGO_URL
 };
