@@ -10,7 +10,9 @@ const relationMap = {
   }
 }
 
-// TODO: Return normal error message saying no movies found.
+// TODO: Return normal error message saying no actors found.
+// FIXME: Return empty object when nothing found...
+// FIXME: Extract to helper function for all relations.
 const manyActors = (results) => {
   let actors = [];
   let actor = {};
@@ -25,8 +27,8 @@ const manyActors = (results) => {
       actor = recordActor;
     }
 
-    if('relationship' in record) {
-      relationType = relationMap[record.get('relationship').type];
+    if(record.keys[1] == 'relationship') {
+      relationType = relationMap[record.get('relationship').type]
       actor[relationType.field] = actor[relationType.field] || [];
 
       let relationObject = new relationType.model(record.get('n'));
@@ -66,13 +68,13 @@ const insertMovieRole = (actorId, movieId, roles) => {
 
 const find = (identifier) => {
   return SESSION
-    .run(`MATCH (actor:Actor {id: ${identifier}})-[relationship]-(n) RETURN actor, relationship, n`)
+    .run(`MATCH (actor:Actor {id: ${identifier}})-[relationship]-(n) RETURN actor, relationship, n  ORDER BY n.year DESC`)
     .then(r => manyActors(r)[0]);
 }
 
 const findAll = (where, page, perPage, orderby, dir) => {
   return SESSION
-    .run(`MATCH (actor:Actor) RETURN actor.id SKIP ${Math.max(0,page-1)*perPage} LIMIT ${perPage}`)
+    .run(`MATCH (actor:Actor) RETURN actor.id ORDER BY actor.${orderby} ${dir} SKIP ${Math.max(0,page-1)*perPage} LIMIT ${perPage}`)
     .then(r => {
       ids = r.records.map(a => a.get('actor.id').low)
       return SESSION
