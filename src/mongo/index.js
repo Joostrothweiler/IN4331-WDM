@@ -14,8 +14,9 @@ function _getModel(type) {
 }
 
 async function insertModel(type, object) {
-  object._id = object.id
+  object._id = object.id;
 
+  console.log(object);
   console.log(`Inserting ${type}`);
   const Model = _getModel(type);
   return Model.create(object);
@@ -47,7 +48,7 @@ async function findAll(type, where, page = 0, perPage = 10, orderby, dir) {
 
   console.log(`Finding ${type} page ${page} per ${perPage} orderby ${orderby} ${dir}`);
   const Model = _getModel(type);
-  console.log(perPage)
+  console.log(perPage);
   return Model.find().sort([[orderby, dir]]).skip(page).limit(perPage);
 }
 

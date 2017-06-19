@@ -24,3 +24,4 @@ const actorSchema = new Schema({
 const Actor = mongoose.model('Actor', actorSchema);
 
 module.exports = Actor;
+
