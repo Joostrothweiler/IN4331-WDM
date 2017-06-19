@@ -29,4 +29,22 @@ server.use((error, req, res, next) => {
 });
 
 console.log(`Starting server on port ${SERVER_PORT}`);
+
+let routes = [];
+server._router.stack.map(function(middleware){
+  if(middleware.route){ // routes registered directly on the app
+      let { methods, path } = middleware.route;
+      routes.push(`${Object.keys(methods).join(', ')}: ${path}`);
+  } else if(middleware.name === 'router'){ // router middleware
+      middleware.handle.stack.forEach(function(handler){
+          route = handler.route;
+          let { methods, path } = route || {};
+          route && routes.push(`${Object.keys(methods).join(', ')}: ${path}`);
+      });
+  }
+});
+
+console.log(`The following routes are registered:`);
+routes.forEach(route => console.log(route));
+
 server.listen(SERVER_PORT);
