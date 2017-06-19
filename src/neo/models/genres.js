@@ -7,12 +7,17 @@ const manyGenres = (results) => {
 }
 
 const insert = (object) => {
-  console.log(object.genre)
   return SESSION
     .run(`CREATE (genre:Genre {
         id: ${object.id},
         genre: '${object.genre}'
       }) RETURN genre`)
+    .then(r => manyGenres(r)[0]);
+}
+
+const find = (identifier) => {
+  return SESSION
+    .run(`MATCH (genre:Genre {id: ${identifier}})-[relationship]-(m) RETURN genre, relationship, m`)
     .then(r => manyGenres(r)[0]);
 }
 
@@ -23,7 +28,15 @@ const findAll = () => {
     .then(r => manyGenres(r));
 };
 
+const deleteAll = () => {
+  return SESSION
+    .run(`MATCH (genre:Genre) DETACH DELETE genre`)
+    .then(r => r);
+}
+
 module.exports = {
   findAll,
-  insert
+  insert,
+  find,
+  deleteAll
 };

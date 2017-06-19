@@ -3,10 +3,11 @@ const Models = require('./models');
 const typeMap = {
   movies: 'Movie',
   actors: 'Actor',
-  'genres': 'Genre'
+  genres: 'Genre',
 }
 
 function _getModel(type) {
+  console.log(type)
   if (!(type in typeMap)) throw new Error(`'${type}' is not a valid model name.`);
   let key = typeMap[type];
   return Models[key];

@@ -25,7 +25,8 @@ const manyActors = (results) => {
       actor = recordActor;
     }
 
-    if(relationType = relationMap[record.get('relationship').type]) {
+    if('relationship' in record) {
+      relationType = relationMap[record.get('relationship').type];
       actor[relationType.field] = actor[relationType.field] || [];
 
       let relationObject = new relationType.model(record.get('n'));
@@ -52,6 +53,7 @@ const insert = (object) => {
 
 const insertMovieRole = (actorId, movieId, roles) => {
   // FIXME: Do we actually want to be able to store multiple roles for movie->actor relation?
+  // Right now we use arrays to store roles.
   roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
 
   return SESSION

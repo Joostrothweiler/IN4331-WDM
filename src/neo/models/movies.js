@@ -1,12 +1,17 @@
 const { SESSION } = require('../connection.js');
 const Movie = require('./neo4j/movie.js');
 const Actor = require('./neo4j/actor.js');
+const Genre = require('./neo4j/genre.js');
 
 const relationMap = {
   ACTED_IN: {
     model: Actor,
     field: 'actors',
     properties: 'roles',
+  },
+  FALLS_IN: {
+    model: Genre,
+    field: 'genres',
   }
 }
 
@@ -24,12 +29,15 @@ const manyMovies = (results) => {
       }
       movie = recordMovie;
     }
-
-    if(relationType = relationMap[record.get('relationship').type]) {
+    if(record.keys[1] == 'relationship') {
+      relationType = relationMap[record.get('relationship').type]
       movie[relationType.field] = movie[relationType.field] || [];
 
       let relationObject = new relationType.model(record.get('n'));
-      relationObject[relationType.properties] = record.get('relationship').properties[relationType.properties];
+
+      if(relationType.properties != undefined) {
+        relationObject[relationType.properties] = record.get('relationship').properties[relationType.properties];
+      }
       movie[relationType.field].push(relationObject);
     }
   })
@@ -46,7 +54,12 @@ const insert = (object) => {
 }
 
 const insertGenre = (movieId, genreId) => {
-  return `movie: ${movieId}, genre: ${genreId}.`;
+  return SESSION
+    .run(`MATCH (movie:Movie) WHERE movie.id = ${movieId}
+          MATCH (genre:Genre) WHERE genre.id = ${genreId}
+          CREATE (movie)-[:FALLS_IN]->(genre)
+          RETURN movie`)
+    .then(r => r);
 }
 
 const find = (identifier) => {
