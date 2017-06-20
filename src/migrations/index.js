@@ -1,5 +1,6 @@
 const { deleteModels } = require('./helpers');
 const Mongo = require('./mongo');
+const Neo = require('./neo');
 
 async function migrate(deleteFirst = false) {
   if(deleteFirst) {
@@ -7,14 +8,14 @@ async function migrate(deleteFirst = false) {
     await deleteModels('mongo', 'actors');
     console.log('Deleted mongo models');
 
-    // await API_HELPERS.deleteModels('neo', 'movies');
-    // await API_HELPERS.deleteModels('neo', 'actors');
-    // console.log('Deleted neo models');
+    await deleteModels('neo', 'movies');
+    await deleteModels('neo', 'actors');
+    await deleteModels('neo', 'genres');
+    console.log('Deleted neo models');
   }
 
-  Mongo.migrateMovies('mongo');
-  // API_HELPERS.migrateMovies('neo');
+  // Mongo.migrateMovies('mongo');
+  Neo.migrateMovies('neo');
 }
 
-// removeOld();
 migrate(true);
