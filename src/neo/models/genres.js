@@ -56,12 +56,18 @@ const find = (identifier) => {
     .then(r => manyGenres(r)[0]);
 }
 
-// get all movies
-const findAll = (where, page, perPage, orderby, dir) => {
+const findAll = (where, page, perPage, order, dir) => {
   return SESSION
-    .run(`MATCH (genre:Genre) RETURN genre ORDER BY genre.${orderby} ${dir} SKIP ${page*perPage} LIMIT ${perPage}`)
-    .then(r => manyGenres(r));
+    .run(`MATCH (genre:Genre) RETURN genre.id SKIP ${page*perPage} LIMIT ${perPage}`)
+    .then(r => {
+      ids = r.records.map(a => a.get('genre.id').low)
+      return SESSION
+        .run(`MATCH (genre:Genre)-[relationship:FALLS_IN]-(n) WHERE genre.id IN [${ids}]
+              AND n.year >= ${where.year.from} AND n.year <= ${where.year.to} RETURN genre, relationship, n ORDER BY genre.id`)
+        .then(r => manyGenres(r))
+    });
 };
+
 
 const deleteAll = () => {
   return SESSION

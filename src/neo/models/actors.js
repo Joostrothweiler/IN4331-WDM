@@ -72,13 +72,19 @@ const find = (identifier) => {
     .then(r => manyActors(r)[0]);
 }
 
-const findAll = (where, page, perPage, orderby, dir) => {
+function _reduceOrder(order) {
+  return order.map(([ orderby, dir ]) => {
+    return `${orderby} ${dir}`;
+  }).join(', ');
+}
+
+const findAll = (where, page, perPage, order, dir) => {
   return SESSION
-    .run(`MATCH (actor:Actor) RETURN actor.id ORDER BY actor.${orderby} ${dir} SKIP ${page*perPage} LIMIT ${perPage}`)
+    .run(`MATCH (actor:Actor) RETURN actor.id SKIP ${page*perPage} LIMIT ${perPage}`)
     .then(r => {
       ids = r.records.map(a => a.get('actor.id').low)
       return SESSION
-        .run(`MATCH (actor:Actor)-[relationship]-(n) WHERE actor.id IN [${ids}] RETURN actor, relationship, n`)
+        .run(`MATCH (actor:Actor)-[relationship]-(n) WHERE actor.id IN [${ids}] RETURN actor, relationship, n ORDER BY actor.id, ${_reduceOrder(order)}`)
         .then(r => manyActors(r))
     });
 };

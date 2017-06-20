@@ -12,7 +12,7 @@ const movieSchema = new Schema({
   genres: [ String ],
   keywords: [ String ],
   actor_ids: [{
-    _id: { type: mongoose.Schema.Types.Number, ref: 'Actors' },
+    _id: { type: mongoose.Schema.Types.Number, ref: 'Actor' },
     role: String,
   }]
 });

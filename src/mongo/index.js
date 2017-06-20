@@ -36,12 +36,13 @@ async function insertMovieRole(actorId, movieId, role) {
 
 async function find(type, options) {
   const Model = _getModel(type);
-  const { id } = options;
-  console.log(`Finding one Mongo ${type} based on ${id}`)
-  return Model.findOne({'_id' : parseInt(id) });
+  const { where, include } = options;
+  console.log(`Finding one Mongo ${type} based on ${where}`)
+  const res =  Model.findOne(where);
+  return include != null ? res.populate(include) : res;
 }
 
-async function findAll(type, where = {}, page = 0, perPage = 10, orderby, dir) {
+async function findAll(type, where = {}, page = 0, perPage = 10, orderby, groupby, dir, include) {
   const order = (orderby === 'id' || !orderby ) ? '_id' : orderby;
   const direction = dir === 'asc' ? 1 : dir === 'desc' ? -1 : 1;
   const amount = Number.isInteger(perPage) ? perPage : Number.parseInt(perPage);
@@ -52,11 +53,12 @@ async function findAll(type, where = {}, page = 0, perPage = 10, orderby, dir) {
     where.year = { $gte: year, $lte: yearTo}
     delete where.yearTo
   }
-  console.log('abc', where);
 
-  console.log(`Finding ${type} page ${skip} per ${amount} orderby ${order} ${direction}`);
+  console.log(`Finding ${type} page ${skip} per ${amount} orderby ${order} ${direction} with include:`, include);
   const Model = _getModel(type);
-  return Model.find(where).sort([[order, direction]]).skip(skip).limit(amount);
+  const res = Model.find(where).sort([[order, direction]]).skip(skip).limit(amount);
+
+  return include != null ? res.populate(include) : res;
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {

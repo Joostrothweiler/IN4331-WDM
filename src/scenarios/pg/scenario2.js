@@ -1,8 +1,8 @@
-const ORM = require('../orm');
-const Models = require('../pg/models');
+const ORM = require('../../orm');
+const Models = require('../../pg/models');
 
 module.exports = (req, res, next) => {
-  const { database, id } = req.params;
+  const { id } = req.params;
   const { page = 0, perPage = 10, dir = 'asc', orderby = 'year', title, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
@@ -23,9 +23,6 @@ module.exports = (req, res, next) => {
       type: 'movies',
       attributes: [ 'title', 'year' ]
     },
-    // { type: 'actors' },
-    // { type: 'genres' },
-    // { type: 'keywords' },
   ];
 
   const order =[
@@ -33,14 +30,14 @@ module.exports = (req, res, next) => {
   ];
 
 
-  if (id == null) return ORM.findAll(database, 'actors', { where, page, perPage, order, dir, include })
+  if (id == null) return ORM.findAll('pg', 'actors', { where, page, perPage, order, dir, include })
       .then(results => {
         res.json(results);
       }).catch(next);
 
   where.id = id;
 
-  return ORM.find(database, 'actors', { where, order, include })
+  return ORM.find('pg', 'actors', { where, order, include })
     .then(result => {
       res.json(result);
     }).catch(next);

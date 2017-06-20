@@ -38,8 +38,24 @@ async function find(type, options) {
   return Model.find(id);
 }
 
-async function findAll(type, where, page = 0, perPage = 10, order, groupby, dir, include) {
-  console.log(`Finding ${type} page ${page} per ${perPage}`);
+const processWhere = (where) => {
+  if(where.hasOwnProperty('year')) {
+    if(!where.year.hasOwnProperty('from')) {
+      where.year.from = 1
+    }
+    if(!where.year.hasOwnProperty('to')) {
+      where.year.to = (new Date()).getFullYear()
+    }
+  }
+  else {
+    where = { year: { from : 1, to : (new Date()).getFullYear() } }
+  }
+  return where
+}
+
+async function findAll(type, where, page = 0, perPage = 10, order = [['n.id', 'asc']], groupby, dir = 'asc', include) {
+  console.log(`Finding ${type} page ${page} per ${perPage} order by ${order}`);
+  where = processWhere(where)
   const Model = _getModel(type);
   return Model.findAll(where, page, perPage, order, dir);
 }
