@@ -51,3 +51,4 @@ node_modules/
 .npm-debug.log
 .env
 /npm-debug.log
+pgsql_backup.backup

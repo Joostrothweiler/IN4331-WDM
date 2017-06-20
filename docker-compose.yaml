@@ -28,36 +28,36 @@ services:
       - "22241:5432"
     networks:
       - 'postgres'
-  pg-slave1:
-    image: 'danieldent/postgres-replication'
-    restart: 'always'
-    environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      PGDATA: '/var/lib/postgresql/data'
-      REPLICATE_FROM: 'pg-master'
-      PG_WALL_KEEP_SEGMENTS: 32
-    volumes:
-      - ./data/pgs1:/var/lib/postgresql/data
-    networks:
-      - 'postgres'
-    ports:
-      - "22242:5432"
-  pg-slave2:
-    image: 'danieldent/postgres-replication'
-    restart: 'always'
-    environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      PGDATA: '/var/lib/postgresql/data'
-      REPLICATE_FROM: 'pg-master'
-      PG_WALL_KEEP_SEGMENTS: 32
-    volumes:
-      - ./data/pgs2:/var/lib/postgresql/data
-    ports:
-      - "22243:5432"
-    networks:
-      - 'postgres'
+#  pg-slave1:
+#    image: 'danieldent/postgres-replication'
+#    restart: 'always'
+#    environment:
+#      POSTGRES_USER: 'postgres'
+#      POSTGRES_PASSWORD: 'postgres'
+#      PGDATA: '/var/lib/postgresql/data'
+#      PG_WALL_KEEP_SEGMENTS: 32
+#      REPLICATE_FROM: 'pg-master'
+#    volumes:
+#      - ./data/pgs1:/var/lib/postgresql/data
+#    networks:
+#      - 'postgres'
+#    ports:
+#      - "22242:5432"
+#  pg-slave2:
+#    image: 'danieldent/postgres-replication'
+#    restart: 'always'
+#    environment:
+#      POSTGRES_USER: 'postgres'
+#      POSTGRES_PASSWORD: 'postgres'
+#      PGDATA: '/var/lib/postgresql/data'
+#      PG_WALL_KEEP_SEGMENTS: 32
+#      REPLICATE_FROM: 'pg-master'
+#    volumes:
+#      - ./data/pgs2:/var/lib/postgresql/data
+#    ports:
+#      - "22243:5432"
+#    networks:
+#      - 'postgres'
   server:
     build:
       context: .

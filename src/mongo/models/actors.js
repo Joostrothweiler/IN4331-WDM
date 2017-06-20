@@ -15,7 +15,7 @@ const actorSchema = new Schema({
   movie_ids: [
     {
       _id: { type: mongoose.Schema.Types.Number, ref: 'Movies' },
-      roles: [ String ]
+      role: String
     }
   ]
 });
@@ -24,3 +24,4 @@ const actorSchema = new Schema({
 const Actor = mongoose.model('Actor', actorSchema);
 
 module.exports = Actor;
+
