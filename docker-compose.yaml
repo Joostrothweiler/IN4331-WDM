@@ -20,8 +20,10 @@ services:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres'
       PGDATA: '/var/lib/postgresql/data'
+      PG_WALL_KEEP_SEGMENTS: 32
     volumes:
       - ./data/pgm:/var/lib/postgresql/data
+      - ./pgsql_backup:/opt/pgsql_backup
     ports:
       - "22241:5432"
     networks:
@@ -34,6 +36,7 @@ services:
       POSTGRES_PASSWORD: 'postgres'
       PGDATA: '/var/lib/postgresql/data'
       REPLICATE_FROM: 'pg-master'
+      PG_WALL_KEEP_SEGMENTS: 32
     volumes:
       - ./data/pgs1:/var/lib/postgresql/data
     networks:
@@ -48,6 +51,7 @@ services:
       POSTGRES_PASSWORD: 'postgres'
       PGDATA: '/var/lib/postgresql/data'
       REPLICATE_FROM: 'pg-master'
+      PG_WALL_KEEP_SEGMENTS: 32
     volumes:
       - ./data/pgs2:/var/lib/postgresql/data
     ports:
