@@ -23,8 +23,6 @@ module.exports = (req, res, next) => {
 
   const include = {
     type: 'genres',
-    // offset: page * perPage,
-    // limit: perPage,
     where: genre ? {
       genre
     } : id ? { id } : {}
@@ -36,13 +34,11 @@ module.exports = (req, res, next) => {
   ];
 
   if (id == null) return ORM.findAll('pg', 'movies', { where, page, perPage, order, include })
-      // .then(results => results.map(stats))
       .then(results => {
         res.json(results);
       }).catch(next);
 
   return ORM.findAll('pg', 'movies', { where, page, perPage, order, include })
-    // .then(stats)
     .then(result => {
       res.json(result);
     }).catch(next);

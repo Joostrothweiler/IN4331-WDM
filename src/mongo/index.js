@@ -36,9 +36,10 @@ async function insertMovieRole(actorId, movieId, role) {
 
 async function find(type, options) {
   const Model = _getModel(type);
-  const { id } = options;
-  console.log(`Finding one Mongo ${type} based on ${id}`)
-  return Model.findOne({'_id' : parseInt(id) });
+  const { where, include } = options;
+  console.log(`Finding one Mongo ${type} based on ${where}`)
+  const res =  Model.findOne(where);
+  return include != null ? res.populate(include) : res;
 }
 
 async function findAll(type, where = {}, page = 0, perPage = 10, orderby, groupby, dir, include) {
@@ -52,7 +53,6 @@ async function findAll(type, where = {}, page = 0, perPage = 10, orderby, groupb
     where.year = { $gte: year, $lte: yearTo}
     delete where.yearTo
   }
-  console.log('abc', where);
 
   console.log(`Finding ${type} page ${skip} per ${amount} orderby ${order} ${direction} with include:`, include);
   const Model = _getModel(type);

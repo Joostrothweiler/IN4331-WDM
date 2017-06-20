@@ -15,7 +15,7 @@ async function migrate(deleteFirst = false) {
   }
 
   Mongo.migrateMovies('mongo');
-  // Neo.migrateMovies('neo');
+  Neo.migrateMovies('neo');
 }
 
 migrate(false);

@@ -5,14 +5,11 @@ module.exports = (req, res, next) => {
   const { page = 0, perPage = 10, title, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
-    title: {
-      $like: `%${title}`,
-    },
+    title: new RegExp(`.*${title}.*`, 'i'),
     year: {
       $gte: from || 1,
       $lte: to != null ? to : (new Date()).getFullYear()
-    },
-    type: 3
+    }
   });
 
   if (title == null) delete where.title;
@@ -25,19 +22,13 @@ module.exports = (req, res, next) => {
   delete where.from;
   delete where.to;
 
-  const include = [
-    { type: 'series' },
-    { type: 'actors' },
-    { type: 'genres' },
-    { type: 'keywords' },
-  ]
 
-  if (id == null) return ORM.findAll('mongo', 'movies', { where, page, perPage, include })
+  if (id == null) return ORM.findAll('mongo', 'movies', { where, page, perPage, order: 'year' })
       .then(results => {
         res.json(results);
       }).catch(next);
 
-  return ORM.find('mongo', 'movies', { where: { id }, include })
+  return ORM.find('mongo', 'movies', { where: { _id: id } })
     .then(result => {
       res.json(result);
     }).catch(next);

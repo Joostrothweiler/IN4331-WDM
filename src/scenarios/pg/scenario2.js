@@ -23,9 +23,6 @@ module.exports = (req, res, next) => {
       type: 'movies',
       attributes: [ 'title', 'year' ]
     },
-    // { type: 'actors' },
-    // { type: 'genres' },
-    // { type: 'keywords' },
   ];
 
   const order =[
