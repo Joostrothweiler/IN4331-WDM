@@ -31,16 +31,17 @@ async function insertGenre(movieId, genreId) {
   return Model.insertGenre(movieId, genreId);
 }
 
-async function find(type, identifier) {
-  console.log(`Finding ${type} with identifier = ${identifier}`);
+async function find(type, options) {
   const Model = _getModel(type);
-  return Model.find(identifier);
+  const { id } = options;
+  console.log(`Finding ${type} with identifier = ${id}`);
+  return Model.find(id);
 }
 
-async function findAll(type, where, page = 0, perPage = 10, orderby, dir) {
+async function findAll(type, where, page = 0, perPage = 10, order, groupby, dir, include) {
   console.log(`Finding ${type} page ${page} per ${perPage}`);
   const Model = _getModel(type);
-  return Model.findAll(where, page, perPage, orderby, dir);
+  return Model.findAll(where, page, perPage, order, dir);
 }
 
 async function deleteAll(type, page = 0, perPage = 10) {
