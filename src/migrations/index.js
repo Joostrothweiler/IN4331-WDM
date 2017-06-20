@@ -16,4 +16,4 @@ async function migrate(deleteFirst = false) {
 }
 
 // removeOld();
-migrate(false);
+migrate(false).catch(err => console.error(err));

@@ -1,6 +1,12 @@
 const request = require('request');
 const rp = require('request-promise');
 
+const PQueue = require('p-queue');
+
+const queue = new PQueue({
+  concurrency: 8
+});
+
 const { BASE_URL } = require('../config');
 
 async function deleteModels(db, type) {
@@ -51,47 +57,88 @@ async function migrateMovies(migrationDb) {
   let actors_inserted_ids = [];
   let genres_inserted_ids = [];
 
-  const perPage = 300;
-  const numberOfPages = 1000;
+  const perPage = 10;
+  const numberOfPages = 30000;
 
   for (let page = 0; page < numberOfPages; page++) {
     console.log('Fetching next');
-    let movies = await fetchMovies('pg', page, perPage);
-    console.log(`Processing page ${page}/${numberOfPages} with ${perPage} movies per page.`);
+    queue.add(async () => {
 
-    for (let i = 0; i < movies.length; i++) {
-      let movie = movies[i];
-      console.log(`${migrationDb}: migrating movie ${i}`);
-      // Check if not already inserted
-      let nextMovie = await fetchModel(migrationDb, 'movies', movie.id);
+      let movies = await fetchMovies('pg', page, perPage);
+      console.log(`Processing page ${page}/${numberOfPages} with ${perPage} movies per page.`);
 
-      if(nextMovie == undefined || nextMovie == null) {
-        let actors = movie.actors;
+      return Promise.all(movies.map(async (m) => fetchModel(migrationDb, 'movies', m.id)))
+        .then(async (movies) => {
+          return Promise.all(movies.map(async (movie) => {
+            let actors = movie.actors;
 
-        // Send only the plain movie object with request.
-        delete movie.actors;
-        delete movie.genres;
+            // Send only the plain movie object with request.
+            delete movie.actors;
+            delete movie.genres;
 
-        await insertModel(migrationDb, 'movies', movie);
+            await insertModel(migrationDb, 'movies', movie);
 
-        for (let key in actors) {
-          const actor = actors[key];
+            return Promise.all(actors.map(async (a) => {
+              if (!(actors_inserted_ids.indexOf(actor.id) > -1)) {
+                const actor = await fetchModel(migrationDb, 'actors', actor.id);
+                await insertModel(migrationDb, 'actors', actor);
+                actors_inserted_ids.push(actor.id);
+                return insertRole(migrationDb, actor.id, movie.id, actor.acted_in.character);
+              }
+            }));
+          }));
+        });
 
-          if (actors_inserted_ids.indexOf(actor.id) > -1) {
-            // Not inserting actor with id = actor.id - Already in database
-          } else {
-            let actorExists = await fetchModel(migrationDb, 'actors', actor.id);
-            if(actorExists == undefined || actorExists == null) {
-              await insertModel(migrationDb, 'actors', actor);
-              actors_inserted_ids.push(actor.id);
-            }
-          }
+          // for (let key in actors) {
+          //   const actor = actors[key];
+          //
+          //   // Not inserting actor with id = actor.id - Already in database
+          //   if (!(actors_inserted_ids.indexOf(actor.id) > -1)) {
+          //     let actorExists = await fetchModel(migrationDb, 'actors', actor.id);
+          //     if(actorExists == undefined || actorExists == null) {
+          //       await insertModel(migrationDb, 'actors', actor);
+          //       actors_inserted_ids.push(actor.id);
+          //     }
+          //   }
+          //
+          //   return insertRole(migrationDb, actor.id, movie.id, actor.acted_in.character);
+          // }
+        // });
 
-          let res = await insertRole(migrationDb, actor.id, movie.id, actor.acted_in.character);
-        }
-        // Repeat loop for genres.
-      }
-    }
+      // for (let i = 0; i < movies.length; i++) {
+      //   let movie = movies[i];
+      //   console.log(`${migrationDb}: migrating movie ${i}`);
+      //   // Check if not already inserted
+      //   let nextMovie = await fetchModel(migrationDb, 'movies', movie.id);
+      //
+      //   if(nextMovie == undefined || nextMovie == null) {
+      //     let actors = movie.actors;
+      //
+      //     // Send only the plain movie object with request.
+      //     delete movie.actors;
+      //     delete movie.genres;
+      //
+      //     await insertModel(migrationDb, 'movies', movie);
+      //
+      //     for (let key in actors) {
+      //       const actor = actors[key];
+      //
+      //       if (actors_inserted_ids.indexOf(actor.id) > -1) {
+      //         // Not inserting actor with id = actor.id - Already in database
+      //       } else {
+      //         let actorExists = await fetchModel(migrationDb, 'actors', actor.id);
+      //         if(actorExists == undefined || actorExists == null) {
+      //           await insertModel(migrationDb, 'actors', actor);
+      //           actors_inserted_ids.push(actor.id);
+      //         }
+      //       }
+      //
+      //       let res = await insertRole(migrationDb, actor.id, movie.id, actor.acted_in.character);
+      //     }
+      //     // Repeat loop for genres.
+      //   }
+      // }
+    });
   }
   console.log('done')
 }

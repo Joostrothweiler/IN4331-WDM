@@ -12,7 +12,7 @@ const typeMap = {
 };
 
 const assocMap = {
-  // 'movies': [ 'actors', 'genres', /*'series', 'aka_titles', 'keywords'*/ ],
+  'movies': [ 'actors', /*'series', 'aka_titles', 'keywords'*/ ],
   // 'actors': [ 'movies', 'aka_names', 'series' ],
   // 'genres': [ 'movies', 'series' ],
   // 'keywords': [ 'movies', 'series' ],

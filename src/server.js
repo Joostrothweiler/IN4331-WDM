@@ -19,7 +19,7 @@ server.use(morgan('combined'));
 server.get('/favicon.ico', (req, res, next) => res.status(404).end());
 
 server.use(Scenarios);
-server.use('/:database', REST);
+server.use(REST);
 
 server.use((error, req, res, next) => {
   console.error(error);

@@ -11,7 +11,7 @@ router.use(bodyParser.urlencoded({
 }));
 
 // Index
-router.get('/:type', (req, res, next) => {
+router.get('/:database/:type', (req, res, next) => {
 
   const { database, type } = req.params;
   const { page = 0, perPage = 10, dir = 'asc', orderby = 'id'} = req.query;
@@ -25,17 +25,17 @@ router.get('/:type', (req, res, next) => {
   delete where.dir;
   delete where.orderby;
 
-  ORM.findAll('pg', type, { where, page, perPage, orderby, dir }, res.locals.context)
+  ORM.findAll(database, type, { where, page, perPage, orderby, dir }, res.locals.context)
     .then(results => {
     res.json(results);
   }).catch(next);
 });
 
 // Show
-router.get('/:type/:id', (req, res, next) => {
+router.get('/:database/:type/:id', (req, res, next) => {
   const { database, type, id } = req.params;
 
-  ORM.find('pg', type, { id })
+  ORM.find(database, type, { id })
     .then(result => {
       res.json(result);
     }).catch(next);
@@ -49,24 +49,24 @@ function log(req, res, next) {
   next();
 }
 
-// Nested routes
-router.use('/:super_type/:super_id',
-  log,
-  router
-);
+// // Nested routes
+// router.use('/:super_type/:super_id',
+//   log,
+//   router
+// );
 
 // Create
-router.post('/:type', (req, res, next) => {
+router.post('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
   if (_.isEmpty(req.body)) throw new Error(`Empty body submitted to insertion`);
 
-  ORM.insertModel('pg', type, { model: req.body }).then(results => {
+  ORM.insertModel(database, type, { model: req.body }).then(results => {
     res.json(results);
   }).catch(next);
 });
 
 // Post request to delete all entries from database.
-router.delete('/:type', (req, res, next) => {
+router.delete('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
   const { page = 0, perPage = 10 } = req.query;
 
@@ -74,7 +74,7 @@ router.delete('/:type', (req, res, next) => {
   delete where.page;
   delete where.perPage;
 
-  ORM.deleteAll('pg', type, { where, page, perPage })
+  ORM.deleteAll(database, type, { where, page, perPage })
     .then(results => {
       res.json(results);
     }).catch(next);
@@ -87,7 +87,7 @@ router.post('/actors/:actor/movies/:movie', (req, res, next) => {
 
   console.log(movie)
 
-  ORM.insertMovieRole('pg', actor, movie, roles).then(result => {
+  ORM.insertMovieRole(database, actor, movie, roles).then(result => {
     res.json(result);
   }).catch(next);
 });
