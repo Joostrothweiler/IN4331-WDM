@@ -72,9 +72,10 @@ const find = (identifier) => {
 
 const _makeWhereString = (where) => {
   let whereString = `WHERE`
-  whereString = where.genre !== null ? `${whereString} g.genre = '${where.genre}' AND` : whereString
+  whereString = where.genre !== undefined ? `${whereString} g.genre = '${where.genre}' AND` : whereString
   whereString = `${whereString} movie.year >= ${where.year.from} AND movie.year <= ${where.year.to}`
-  let relationString = where.genre !== null ? `:FALLS_IN` : ''
+  let relationString = where.genre !== undefined ? `:FALLS_IN` : ''
+  console.log(whereString)
   return [whereString, relationString]
 }
 

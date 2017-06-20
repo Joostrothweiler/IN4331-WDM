@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
       from: parseInt(from) || 1,
       to: parseInt(to != null ? to : (new Date()).getFullYear())
     },
-    genre: genre ? genre : null
+    genre: genre ? genre : undefined
   });
 
   delete where.page;
