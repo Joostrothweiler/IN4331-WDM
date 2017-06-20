@@ -1,7 +1,7 @@
-const ORM = require('../orm');
+const ORM = require('../../orm');
 
 module.exports = (req, res, next) => {
-  const { database, id } = req.params;
+  const { id } = req.params;
   const { page = 0, perPage = 10, title, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
@@ -32,12 +32,12 @@ module.exports = (req, res, next) => {
     { type: 'keywords' },
   ]
 
-  if (id == null) return ORM.findAll(database, 'movies', { where, page, perPage, include })
+  if (id == null) return ORM.findAll('mongo', 'movies', { where, page, perPage, include })
       .then(results => {
         res.json(results);
       }).catch(next);
 
-  return ORM.find(database, 'movies', { id, include })
+  return ORM.find('mongo', 'movies', { where: { id }, include })
     .then(result => {
       res.json(result);
     }).catch(next);

@@ -1,8 +1,8 @@
-const ORM = require('../orm');
-const connection = require('../pg/connection');
+const ORM = require('../../orm');
+const Models = require('../../pg/models');
 
 module.exports = (req, res, next) => {
-  const { database, id } = req.params;
+  const { id } = req.params;
   const { page = 0, perPage = 1000, dir = 'asc', orderby = 'id', genre, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {

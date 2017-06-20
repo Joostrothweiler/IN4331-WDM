@@ -1,4 +1,4 @@
-const ORM = require('../orm');
+const ORM = require('../../orm');
 
 function stats(actor) {
   let { id, fname, mname, lname
@@ -14,7 +14,7 @@ function stats(actor) {
 }
 
 module.exports = (req, res, next) => {
-  const { database, id } = req.params;
+  const { id } = req.params;
   const { page = 0, perPage = 1000, dir = 'asc', orderby = 'id'} = req.query;
 
   let where = Object.assign({}, req.query);
@@ -27,13 +27,13 @@ module.exports = (req, res, next) => {
     type: 'movies'
   };
 
-  if (id == null) return ORM.findAll(database, 'actors', { where, page, perPage, orderby, dir, include })
+  if (id == null) return ORM.findAll('mongo', 'actors', { where, page, perPage, orderby, dir, include })
       .then(results => results.map(stats))
       .then(results => {
         res.json(results);
       }).catch(next);
 
-  return ORM.find(database, 'actors', { id, include })
+  return ORM.find('mongo', 'actors', { id, include })
     .then(stats)
     .then(result => {
       res.json(result);

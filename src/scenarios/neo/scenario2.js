@@ -1,8 +1,8 @@
-const ORM = require('../orm');
-const Models = require('../pg/models');
+const ORM = require('../../orm');
+const Models = require('../../neo/models');
 
 module.exports = (req, res, next) => {
-  const { database, id } = req.params;
+  const { id } = req.params;
   const { page = 0, perPage = 10, dir = 'asc', orderby = 'year', title, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
@@ -13,34 +13,25 @@ module.exports = (req, res, next) => {
   delete where.page;
   delete where.perPage;
   delete where.dir;
-  delete where.orderby;
+  delete where.order;
 
   delete where.from;
   delete where.to;
 
-  const include = [
-    {
-      type: 'movies',
-      attributes: [ 'title', 'year' ]
-    },
-    // { type: 'actors' },
-    // { type: 'genres' },
-    // { type: 'keywords' },
+  // let order = `asc ${orderby}, n.year`;
+  let order = [
+    [ 'actor.id', 'asc'],
+    [ `n.${orderby}`, dir]
   ];
 
-  const order =[
-    [ Models.Movie, orderby, dir ]
-  ];
-
-
-  if (id == null) return ORM.findAll(database, 'actors', { where, page, perPage, order, dir, include })
+  if (id == null) return ORM.findAll('neo', 'actors', { where, page, perPage, order, dir })
       .then(results => {
         res.json(results);
       }).catch(next);
 
   where.id = id;
 
-  return ORM.find(database, 'actors', { where, order, include })
+  return ORM.find('neo', 'actors', { id } )
     .then(result => {
       res.json(result);
     }).catch(next);

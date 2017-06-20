@@ -70,9 +70,10 @@ const find = (identifier) => {
     .then(r => manyMovies(r)[0]);
 }
 
-const findAll = (where, page, perPage, orderby, dir) => {
+const findAll = (where, page, perPage, order, dir) => {
+  console.log(where)
   return SESSION
-    .run(`MATCH (movie:Movie) RETURN movie.id ORDER BY movie.${orderby} ${dir} SKIP ${page*perPage} limit ${perPage}`)
+    .run(`MATCH (movie:Movie) RETURN movie.id ORDER BY movie.year ${dir} SKIP ${page*perPage} limit ${perPage}`)
     .then(r => {
       ids = r.records.map(a => a.get('movie.id').low)
       return SESSION
