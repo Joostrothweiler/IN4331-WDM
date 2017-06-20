@@ -3,7 +3,7 @@ const Models = require('../../pg/models');
 
 module.exports = (req, res, next) => {
   const { id } = req.params;
-  const { page = 0, perPage = 1000, genre, from, to } = req.query;
+  const { page = 0, perPage = 10, genre, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
     year: {

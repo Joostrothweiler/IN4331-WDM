@@ -70,14 +70,21 @@ const find = (identifier) => {
     .then(r => manyMovies(r)[0]);
 }
 
+const _makeWhereString = (where) => {
+  let whereString = `WHERE`
+  whereString = where.genre !== null ? `${whereString} g.genre = '${where.genre}' AND` : whereString
+  whereString = `${whereString} movie.year >= ${where.year.from} AND movie.year <= ${where.year.to}`
+  let relationString = where.genre !== null ? `:FALLS_IN` : ''
+  return [whereString, relationString]
+}
+
 const findAll = (where, page, perPage, order, dir) => {
-  console.log(where)
   return SESSION
-    .run(`MATCH (movie:Movie) RETURN movie.id ORDER BY movie.year ${dir} SKIP ${page*perPage} limit ${perPage}`)
+    .run(`MATCH (movie:Movie)-[r:FALLS_IN]-(g:Genre) ${_makeWhereString(where)[0]} RETURN movie.id ORDER BY movie.year ${dir} SKIP ${page*perPage} limit ${perPage}`)
     .then(r => {
       ids = r.records.map(a => a.get('movie.id').low)
       return SESSION
-        .run(`MATCH (movie:Movie)-[relationship]-(n) WHERE movie.id IN [${ids}] RETURN movie, relationship, n`)
+        .run(`MATCH (movie:Movie)-[relationship${_makeWhereString(where)[1]}]-(n) WHERE movie.id IN [${ids}] RETURN movie, relationship, n`)
         .then(r => manyMovies(r))
     });
 };
