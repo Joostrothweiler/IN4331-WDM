@@ -62,6 +62,7 @@ async function migrateMovies(migrationDb) {
       let movie = movies[i];
       console.log(`${migrationDb}: migrating movie ${i}`);
       // Check if not already inserted
+      console.log('TESTING', movie.id);
       let nextMovie = await fetchModel(migrationDb, 'movies', movie.id);
 
       if(nextMovie == undefined || nextMovie == null) {
@@ -70,7 +71,7 @@ async function migrateMovies(migrationDb) {
         // Send only the plain movie object with request.
         delete movie.actors;
         movie.genres = movie.genres.map(genre => genre.genre);
-        console.log(movie)
+        console.log('Blabla:', movie);
 
 
         await insertModel(migrationDb, 'movies', movie);

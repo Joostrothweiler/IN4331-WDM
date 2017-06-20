@@ -13,6 +13,7 @@ function _getModel(type) {
 }
 
 async function insertModel(type, object) {
+  console.log(`Inserting ${type} into Mongo:`, object);
   object._id = object.id;
 
   const Model = _getModel(type);
@@ -22,8 +23,8 @@ async function insertModel(type, object) {
 async function insertMovieRole(actorId, movieId, role) {
   const character = role ? decodeURIComponent(role).replace(/["'()]/g,"") : null;
 
-  let movie = await find('movies', movieId);
-  let actor = await find('actors', actorId);
+  let movie = await find('movies', { id: movieId });
+  let actor = await find('actors', { id: actorId });
 
   if (!_.some(actor.movie_ids, { _id: movie._id})) {
     actor.movie_ids.push({ _id: movie._id, 'role': character });
@@ -33,9 +34,11 @@ async function insertMovieRole(actorId, movieId, role) {
   }
 }
 
-async function find(type, id) {
+async function find(type, options) {
   const Model = _getModel(type);
-  return Model.findOne({'_id' : id});
+  const { id } = options;
+  console.log(`Finding one Mongo ${type} based on ${id}`)
+  return Model.findOne({'_id' : parseInt(id) });
 }
 
 async function findAll(type, where = {}, page = 0, perPage = 10, orderby, dir) {
@@ -49,7 +52,7 @@ async function findAll(type, where = {}, page = 0, perPage = 10, orderby, dir) {
     where.year = { $gte: year, $lte: yearTo}
     delete where.yearTo
   }
-  console.log(where)
+  console.log('abc', where);
 
   console.log(`Finding ${type} page ${skip} per ${amount} orderby ${order} ${direction}`);
   const Model = _getModel(type);

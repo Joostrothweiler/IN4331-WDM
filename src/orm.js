@@ -40,10 +40,10 @@ async function insertModel(db, type, options) {
   return database.insertModel(type, model);
 }
 
-async function insertMovieRole(db, actorId, movieId, roles) {
+async function insertMovieRole(db, actorId, movieId, role) {
   const database = _getDatabase(db);
 
-  return database.insertMovieRole(actorId, movieId, roles);
+  return database.insertMovieRole(actorId, movieId, role);
 }
 
 module.exports = {

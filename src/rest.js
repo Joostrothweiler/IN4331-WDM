@@ -81,11 +81,11 @@ router.delete('/:database/:type', (req, res, next) => {
 });
 
 // Insert actor - movie relation by passing actor and movie id.
-router.post('/actors/:actor/movies/:movie', (req, res, next) => {
+router.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { database, actor, movie } = req.params;
   const { role } = req.query;
 
-  console.log(movie)
+  console.log('Inserting actor?:', movie);
 
   ORM.insertMovieRole(database, actor, movie, role).then(result => {
     res.json(result);
