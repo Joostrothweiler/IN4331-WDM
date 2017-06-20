@@ -18,22 +18,18 @@ module.exports = (req, res, next) => {
   delete where.from;
   delete where.to;
 
-  const include = [
-    {
-      type: 'movies',
-      attributes: [ 'title', 'year' ]
-    },
-    // { type: 'actors' },
-    // { type: 'genres' },
-    // { type: 'keywords' },
-  ];
+  const include = {
+    path: 'movie_ids._id',
+    select: ['title', 'year']
+  };
 
+  // const order = 'id';
   const order =[
-    [ Models.Movie, orderby, dir ]
+    [ orderby, dir ]
   ];
 
 
-  if (id == null) return ORM.findAll('mongo', 'actors', { where, page, perPage, order, dir, include })
+  if (id == null) return ORM.findAll('mongo', 'actors', { where, page, perPage, order: 'id', dir, include })
       .then(results => {
         res.json(results);
       }).catch(next);

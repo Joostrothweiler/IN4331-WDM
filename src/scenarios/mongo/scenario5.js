@@ -1,16 +1,38 @@
 const ORM = require('../../orm');
 
+function stats(movies) {
+  return Object.entries(movies.reduce((memo, movie) => {
+    let { genres } = movie;
+
+    [].concat(genres).forEach(genre => {
+      genre in memo ? memo[genre]++ : memo[genre] = 1;
+    });
+
+    return memo;
+  }, {})).map(([genre, movies_count]) => {
+    return {
+      genre,
+      movies_count
+    }
+  });
+}
+
+
 module.exports = (req, res, next) => {
   const { id } = req.params;
-  const { page = 0, perPage = 1000, dir = 'asc', orderby = 'id', genre, from, to } = req.query;
+  const { page = 0, perPage = 1000, genre, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
+    genres: {
+      $in: genre,
+    },
     year: {
-      $gt: from || 1,
-      $lt: to != null ? to : (new Date()).getFullYear()
+      $gte: parseInt(from) || 1,
+      $lte: parseInt(to != null ? to : (new Date()).getFullYear())
     }
   });
 
+  if (genre == null) delete where.genres;
   delete where.page;
   delete where.perPage;
   delete where.dir;
@@ -18,25 +40,32 @@ module.exports = (req, res, next) => {
 
   delete where.genre;
   delete where.from;
+  delete where.to;
 
-  const sql = `
-  SELECT *
-  FROM "genres"
-  LEFT JOIN (
-      SELECT "genres"."idgenres", "genre", COUNT("genre") as "movies_count"
-      FROM "genres"
-      LEFT JOIN "movies_genres" ON "movies_genres"."idgenres" = "genres"."idgenres"
-      LEFT JOIN "movies" ON "movies_genres"."idmovies" = "movies"."idmovies"
-      WHERE "movies"."year" >= ${from || 1} AND "movies"."year" <= ${to || (new Date()).getFullYear()}
-      GROUP BY "genre", "genres"."idgenres"
-  ) as temp
-  ON "genres"."idgenres" = "temp"."idgenres"
-  LIMIT ${perPage}
-  OFFSET ${page * perPage};
-`
+  let include;
+  // const include = {
+  //   type: 'genres',
+  //   // offset: page * perPage,
+  //   // limit: perPage,
+  //   where: genre ? {
+  //     genre
+  //   } : id ? { id } : {}
+  // };
 
-  return connection.query(sql, { type: connection.QueryTypes.SELECT})
-    .then(results => {
-      res.json(results);
+  // const order = [
+  //   [ 'year', 'asc' ],
+  //   [ 'title', 'asc' ]
+  // ];
+
+  if (id == null) return ORM.findAll('mongo', 'movies', { where, page, perPage, order: 'year', include })
+      .then(stats)
+      .then(results => {
+        res.json(results);
+      }).catch(next);
+
+  return ORM.findAll('mongo', 'movies', { where: { genres: id }, page, perPage, order: 'year', include })
+    .then(stats)
+    .then(result => {
+      res.json(result);
     }).catch(next);
 };

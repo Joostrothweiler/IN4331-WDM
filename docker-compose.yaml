@@ -1,17 +1,5 @@
 version: "2"
 services:
-#  postgres:
-#    image: postgres:9.6
-#    ports:
-#      - "2224:5432"
-#    volumes:
-#      - ./data/pg:/var/lib/postgresql/data
-#    environment:
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_USER: postgres
-#      POSTGRES_DB: wdm
-#    networks:
-#      - "postgres"
   pg-master:
     image: 'danieldent/postgres-replication'
     restart: 'always'
@@ -28,36 +16,36 @@ services:
       - "22241:5432"
     networks:
       - 'postgres'
-#  pg-slave1:
-#    image: 'danieldent/postgres-replication'
-#    restart: 'always'
-#    environment:
-#      POSTGRES_USER: 'postgres'
-#      POSTGRES_PASSWORD: 'postgres'
-#      PGDATA: '/var/lib/postgresql/data'
-#      PG_WALL_KEEP_SEGMENTS: 32
-#      REPLICATE_FROM: 'pg-master'
-#    volumes:
-#      - ./data/pgs1:/var/lib/postgresql/data
-#    networks:
-#      - 'postgres'
-#    ports:
-#      - "22242:5432"
-#  pg-slave2:
-#    image: 'danieldent/postgres-replication'
-#    restart: 'always'
-#    environment:
-#      POSTGRES_USER: 'postgres'
-#      POSTGRES_PASSWORD: 'postgres'
-#      PGDATA: '/var/lib/postgresql/data'
-#      PG_WALL_KEEP_SEGMENTS: 32
-#      REPLICATE_FROM: 'pg-master'
-#    volumes:
-#      - ./data/pgs2:/var/lib/postgresql/data
-#    ports:
-#      - "22243:5432"
-#    networks:
-#      - 'postgres'
+  pg-slave1:
+   image: 'danieldent/postgres-replication'
+   restart: 'always'
+   environment:
+     POSTGRES_USER: 'postgres'
+     POSTGRES_PASSWORD: 'postgres'
+     PGDATA: '/var/lib/postgresql/data'
+     PG_WALL_KEEP_SEGMENTS: 32
+     REPLICATE_FROM: 'pg-master'
+   volumes:
+     - ./data/pgs1:/var/lib/postgresql/data
+   networks:
+     - 'postgres'
+   ports:
+     - "22242:5432"
+  pg-slave2:
+   image: 'danieldent/postgres-replication'
+   restart: 'always'
+   environment:
+     POSTGRES_USER: 'postgres'
+     POSTGRES_PASSWORD: 'postgres'
+     PGDATA: '/var/lib/postgresql/data'
+     PG_WALL_KEEP_SEGMENTS: 32
+     REPLICATE_FROM: 'pg-master'
+   volumes:
+     - ./data/pgs2:/var/lib/postgresql/data
+   ports:
+     - "22243:5432"
+   networks:
+     - 'postgres'
   server:
     build:
       context: .
