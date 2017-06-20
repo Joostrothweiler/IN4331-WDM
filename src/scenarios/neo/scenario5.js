@@ -1,43 +1,40 @@
 const ORM = require('../../orm');
-const Models = require('../../pg/models');
+const Models = require('../../neo/models');
+
+function stats(g) {
+  let {
+    id,
+    genre,
+    movies: { length: movies_count }
+  } = g;
+
+  return {
+    id,
+    genre,
+    movies_count
+  };
+}
 
 module.exports = (req, res, next) => {
   const { id } = req.params;
-  const { page = 0, perPage = 1000, dir = 'asc', orderby = 'id', genre, from, to } = req.query;
+  const { page = 0, perPage = 10, dir = 'asc', orderby = 'year', title, from, to } = req.query;
 
   let where = Object.assign({}, req.query, {
     year: {
-      $gt: from || 1,
-      $lt: to != null ? to : (new Date()).getFullYear()
-    }
+      from: parseInt(from) || 1,
+      to: parseInt(to != null ? to : (new Date()).getFullYear())
+    },
   });
 
-  delete where.page;
-  delete where.perPage;
-  delete where.dir;
-  delete where.orderby;
+  if (id == null) return ORM.findAll('neo', 'genres', { where, page, perPage, dir })
+      .then(results => results.map(stats))
+      .then(results => {
+        res.json(results);
+      }).catch(next);
 
-  delete where.genre;
-  delete where.from;
-
-  const sql = `
-  SELECT *
-  FROM "genres"
-  LEFT JOIN (
-      SELECT "genres"."idgenres", "genre", COUNT("genre") as "movies_count"
-      FROM "genres"
-      LEFT JOIN "movies_genres" ON "movies_genres"."idgenres" = "genres"."idgenres"
-      LEFT JOIN "movies" ON "movies_genres"."idmovies" = "movies"."idmovies"
-      WHERE "movies"."year" >= ${from || 1} AND "movies"."year" <= ${to || (new Date()).getFullYear()}
-      GROUP BY "genre", "genres"."idgenres"
-  ) as temp
-  ON "genres"."idgenres" = "temp"."idgenres"
-  LIMIT ${perPage}
-  OFFSET ${page * perPage};
-`
-
-  return connection.query(sql, { type: connection.QueryTypes.SELECT})
-    .then(results => {
-      res.json(results);
+  return ORM.find('neo', 'genres', { id })
+    .then(stats)
+    .then(result => {
+      res.json(result);
     }).catch(next);
 };
