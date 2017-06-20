@@ -1,5 +1,5 @@
 const ORM = require('../../orm');
-const Models = require('../../pg/models');
+const connection = require('../../pg/connection');
 
 module.exports = (req, res, next) => {
   const { id } = req.params;

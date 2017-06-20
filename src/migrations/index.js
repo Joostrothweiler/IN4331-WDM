@@ -14,8 +14,8 @@ async function migrate(deleteFirst = false) {
     console.log('Deleted neo models');
   }
 
-  // Mongo.migrateMovies('mongo');
-  Neo.migrateMovies('neo');
+  Mongo.migrateMovies('mongo');
+  // Neo.migrateMovies('neo');
 }
 
 migrate(false);

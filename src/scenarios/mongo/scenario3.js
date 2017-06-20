@@ -2,7 +2,7 @@ const ORM = require('../../orm');
 
 function stats(actor) {
   let { id, fname, mname, lname
-    , movies: { length: movies_count }
+    , movie_ids: { length: movies_count }
    } = actor;
   let name = [ fname, mname, lname ].filter(x => x).join(' ');
 
@@ -23,9 +23,10 @@ module.exports = (req, res, next) => {
   delete where.dir;
   delete where.orderby;
 
-  const include = {
-    type: 'movies'
-  };
+  let include;
+  // const include = {
+  //   // type: 'movies'
+  // };
 
   if (id == null) return ORM.findAll('mongo', 'actors', { where, page, perPage, orderby, dir, include })
       .then(results => results.map(stats))
