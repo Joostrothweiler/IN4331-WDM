@@ -38,8 +38,8 @@ async function find(type, options) {
   return Model.find(id);
 }
 
-async function findAll(type, where, page = 0, perPage = 10, order, groupby, dir, include) {
-  console.log(`Finding ${type} page ${page} per ${perPage}`);
+async function findAll(type, where, page = 0, perPage = 10, order = 'id', groupby, dir = 'asc', include) {
+  console.log(`Finding ${type} page ${page} per ${perPage} order by ${order}`);
   const Model = _getModel(type);
   return Model.findAll(where, page, perPage, order, dir);
 }

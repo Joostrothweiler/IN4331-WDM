@@ -18,4 +18,4 @@ async function migrate(deleteFirst = false) {
   Neo.migrateMovies('neo');
 }
 
-migrate(true);
+migrate(false);

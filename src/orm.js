@@ -47,7 +47,9 @@ async function insertMovieRole(db, actorId, movieId, role) {
 }
 
 async function insertGenre(db, movieId, genreId) {
-  return db.insertGenre(movieId, genreId);
+  const database = _getDatabase(db);
+  
+  return database.insertGenre(movieId, genreId);
 }
 
 module.exports = {

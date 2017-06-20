@@ -32,6 +32,13 @@ async function insertRole(db, actor, movie, roles) {
   });
 }
 
+async function insertGenre(db, movieId, genreId) {
+  return rp.post({
+    url: BASE_URL + `/${db}/movies/${movieId}/genres/${genreId}`,
+    json: true
+  });
+}
+
 async function fetchMovies(db, page, perPage) {
   return rp.get({
     url: BASE_URL + `/${db}/movies?page=${page}&perPage=${perPage}`,
@@ -51,5 +58,6 @@ module.exports = {
   insertModel,
   insertRole,
   fetchMovies,
-  fetchModel
+  fetchModel,
+  insertGenre
 }
