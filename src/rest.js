@@ -6,9 +6,7 @@ const ORM = require('./orm');
 
 const router = express.Router({ mergeParams: true });
 
-router.use(bodyParser.urlencoded({
-  extended: true
-}));
+router.use(bodyParser.json());
 
 // Index
 router.get('/:database/:type', (req, res, next) => {
@@ -58,7 +56,7 @@ function log(req, res, next) {
 // Create
 router.post('/:database/:type', (req, res, next) => {
   const { database, type } = req.params;
-  if (_.isEmpty(req.body)) throw new Error(`Empty body submitted to insertion`);
+  if (_.isEmpty(req.body)) throw new Error(`Empty body submitted to insertion ${JSON.stringify(req.body)}`);
 
   ORM.insertModel(database, type, { model: req.body }).then(results => {
     res.json(results);
@@ -83,9 +81,9 @@ router.delete('/:database/:type', (req, res, next) => {
 // Insert actor - movie relation by passing actor and movie id.
 router.post('/:database/actors/:actor/movies/:movie', (req, res, next) => {
   const { database, actor, movie } = req.params;
-  const { role } = req.query;
+  const { role } = req.body;
 
-  console.log('Inserting actor?:', movie);
+  console.log('Inserting actor?:', movie, role);
 
   ORM.insertMovieRole(database, actor, movie, role).then(result => {
     res.json(result);

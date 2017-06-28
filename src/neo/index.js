@@ -33,7 +33,7 @@ async function insertGenre(movieId, genreId) {
 
 async function find(type, options) {
   const Model = _getModel(type);
-  const { id } = options;
+  const { where: { id } } = options;
   console.log(`Finding ${type} with identifier = ${id}`);
   return Model.find(id);
 }

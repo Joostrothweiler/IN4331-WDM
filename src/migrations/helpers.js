@@ -1,5 +1,10 @@
 const request = require('request');
-const rp = require('request-promise');
+const fetch = require('node-fetch');
+const PQueue = require('p-queue');
+
+const queue = new PQueue({
+  concurrency: 8
+});
 
 const { BASE_URL } = require('../config');
 
@@ -8,49 +13,56 @@ async function deleteModels(db, type) {
     console.log('Not removing from PG!');
   }
   else {
-    return rp.del({
-      url: BASE_URL + `/${db}/${type}`,
-      json: true
-    });
+    let url = BASE_URL + `/${db}/${type}`;
+    return queue.add( () => fetch(url, {
+      method: 'delete'
+    }).then(response => response.json()) );
   }
 }
 
 async function insertModel(db, type, model) {
-  return rp.post({
-    url: BASE_URL + `/${db}/${type}`,
-    form: model,
-    json: true
-  })
-  console.log('inserted model')
+  let url = BASE_URL + `/${db}/${type}`;
+  // console.log(`Posting to ${url} with:`, model);
+  return queue.add( () => fetch(url, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(model)
+  }) );
 }
 
 async function insertRole(db, actor, movie, roles) {
-  let urlEnd = roles ? `?role="${encodeURIComponent(roles)}"` : '';
-  return rp.post({
-    url: BASE_URL + `/${db}/actors/${actor}/movies/${movie}` + urlEnd,
-    json: true
-  });
+  let url = BASE_URL + `/${db}/actors/${actor}/movies/${movie}`;
+  console.log(`Inserting role to ${url}`, roles);
+  return queue.add( () => fetch(url, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ role: roles })
+  }) );
 }
 
 async function insertGenre(db, movieId, genreId) {
-  return rp.post({
-    url: BASE_URL + `/${db}/movies/${movieId}/genres/${genreId}`,
-    json: true
-  });
+  let url = BASE_URL + `/${db}/movies/${movieId}/genres/${genreId}`;
+  return queue.add( () => fetch(url, {
+    method: 'post'
+  }) );
 }
 
 async function fetchMovies(db, page, perPage) {
-  return rp.get({
-    url: BASE_URL + `/${db}/movies?page=${page}&perPage=${perPage}`,
-    json: true
-  })
+  let url = BASE_URL + `/${db}/movies?page=${page}&perPage=${perPage}`;
+  return queue.add( () => fetch(url, {
+    method: 'get'
+  }).then(response => response.json()) );
 }
 
 async function fetchModel(db, type, id) {
-  return rp.get({
-    url: BASE_URL + `/${db}/${type}/${id}`,
-    json: true
-  })
+  let url = BASE_URL + `/${db}/${type}/${id}`;
+  return queue.add( () => fetch(url, {
+    method: 'get'
+  }).then(response => response.json()) );
 }
 
 module.exports = {

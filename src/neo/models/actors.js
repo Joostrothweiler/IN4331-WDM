@@ -56,12 +56,13 @@ const insert = (object) => {
 const insertMovieRole = (actorId, movieId, roles) => {
   // FIXME: Do we actually want to be able to store multiple roles for movie->actor relation?
   // Right now we use arrays to store roles.
-  roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
+  roles = roles;
+  // roles = roles == undefined ? [] : decodeURIComponent(roles).replace(/["'()]/g,"");
 
   return SESSION
     .run(`MATCH (actor:Actor) WHERE actor.id = ${actorId}
           MATCH (movie:Movie) WHERE movie.id = ${movieId}
-          CREATE (actor)-[:ACTED_IN {roles:['${roles}']}]->(movie)
+          CREATE (actor)-[:ACTED_IN {roles:["${roles}"]}]->(movie)
           RETURN actor`)
     .then(r => r);
 }

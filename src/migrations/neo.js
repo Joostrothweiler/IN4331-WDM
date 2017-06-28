@@ -1,10 +1,73 @@
 const Helpers = require('./helpers');
 
-async function migrateMovies(migrationDb) {
+let actors_inserted_ids = {
+};
+
+async function migrateActor(actor, movie) {
+  // console.log('Migrating actor', actor, movie);
+  if (actor.id in actors_inserted_ids) return Promise.resolve();
+
+  const actorExists = undefined != await Helpers.fetchModel('neo', 'actors', actor.id);
+  if (!actorExists ) {
+    await Helpers.insertModel('neo', 'actors', actor);
+    actors_inserted_ids[actor.id] = true;
+  }
+
+  if (actor.acted_in.character == null) return Promise.resolve();
+  return Helpers.insertRole('neo', actor.id, movie.id, actor.acted_in.character);
+}
+
+// async function migrateGenre(genre, movie) {
+//   const genre = genres[key];
+//   if (genres_inserted_ids.indexOf(genre.id) > -1) return Promise.resolve();
+//
+//     let genreExists = await Helpers.fetchModel('neo', 'genres', genre.id);
+//     if(genreExists == undefined || genreExists == null || genreExists.id == undefined) {
+//       await Helpers.insertModel('neo', 'genres', genre);
+//       genres_inserted_ids.push(genre.id);
+//     }
+//   }
+//
+//   return Helpers.insertGenre('neo', movie.id, genre.id);
+// }
+
+async function migrateMovie(movie) {
+  // Check if not already inserted
+  console.log('Migrating', movie.id);
+
+  let actors = movie.actors;
+  // Send only the plain movie object with request.
+  delete movie.actors;
+
+  movie.genres = movie.genres.map(genre => genre.genre);
+
+  await Helpers.insertModel('neo', 'movies', movie);
+
+  return Promise.all(actors.map(actor => migrateActor(actor, movie)));
+}
+
+async function migrateMovies() {
   let actors_inserted_ids = [];
   let genres_inserted_ids = [];
 
-  const perPage = 300;
+  const perPage = 20;
+  const numberOfPages = 5;
+
+  for (let page = 0; page < numberOfPages; page++) {
+    console.log('Fetching next');
+    let movies = await Helpers.fetchMovies('pg', page, perPage);
+    console.log(`Processing page ${page}/${numberOfPages} with ${perPage} movies per page.`);
+
+    await Promise.all(movies.map(migrateMovie));
+  }
+  console.log('done')
+}
+
+async function migrateMovies2(migrationDb) {
+  let actors_inserted_ids = [];
+  let genres_inserted_ids = [];
+
+  const perPage = 30;
   const numberOfPages = 1000;
 
   for (let page = 0; page < numberOfPages; page++) {

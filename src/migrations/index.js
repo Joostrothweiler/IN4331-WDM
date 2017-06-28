@@ -8,14 +8,14 @@ async function migrate(deleteFirst = false) {
     await deleteModels('mongo', 'actors');
     console.log('Deleted mongo models');
 
-    await deleteModels('neo', 'movies');
-    await deleteModels('neo', 'actors');
-    await deleteModels('neo', 'genres');
-    console.log('Deleted neo models');
+    // await deleteModels('neo', 'movies');
+    // await deleteModels('neo', 'actors');
+    // await deleteModels('neo', 'genres');
+    // console.log('Deleted neo models');
   }
 
   Mongo.migrateMovies('mongo');
-  Neo.migrateMovies('neo');
+  // Neo.migrateMovies('neo');
 }
 
-migrate(false);
+migrate(true).catch(console.error);

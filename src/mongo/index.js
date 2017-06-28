@@ -23,8 +23,8 @@ async function insertModel(type, object) {
 async function insertMovieRole(actorId, movieId, role) {
   const character = role ? decodeURIComponent(role).replace(/["'()]/g,"") : null;
 
-  let movie = await find('movies', { id: movieId });
-  let actor = await find('actors', { id: actorId });
+  let movie = await find('movies', { where: { id: movieId }});
+  let actor = await find('actors', { where: { id: actorId }});
 
   if (!_.some(actor.movie_ids, { _id: movie._id})) {
     actor.movie_ids.push({ _id: movie._id, 'role': character });
