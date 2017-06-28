@@ -35,7 +35,7 @@ router.get('/:database/:type', (req, res, next) => {
 router.get('/:database/:type/:id', (req, res, next) => {
   const { database, type, id } = req.params;
 
-  ORM.find(database, type, { id })
+  ORM.find(database, type, { where: { id } })
     .then(result => {
       res.json(result);
     }).catch(next);

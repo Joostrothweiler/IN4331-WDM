@@ -36,9 +36,11 @@ async function insertMovieRole(actorId, movieId, role) {
 
 async function find(type, options) {
   const Model = _getModel(type);
-  const { where, include } = options;
-  console.log(`Finding one Mongo ${type} based on ${where}`)
-  const res =  Model.findOne(where);
+  const { where = {}, include } = options;
+  let query = Object.assign({}, { _id: where.id }, where);
+  delete query.id;
+  console.log(`Finding one Mongo ${type} based on:`, query);
+  const res =  Model.findOne(query);
   return include != null ? res.populate(include) : res;
 }
 
